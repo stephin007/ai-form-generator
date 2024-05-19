@@ -4,30 +4,17 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import styles from './FormGenerator.module.css';
 
-const loadingTexts = [
-    'Amazing things take time...',
-    'Generating form...',
-    'Just a moment...',
-    'Thinking...',
-    'Hold on...',
-    'Almost there...',
-    'Creating form...',
-    'Processing...',
-    'Just a sec...',
-    'Loading...'
-];
-
 const FormGenerator = () => {
     const [prompt, setPrompt] = useState('');
-    const [numFields, setNumFields] = useState(5);
+    const [numFields, setNumFields] = useState(5); // Default number of fields
     const [formSchema, setFormSchema] = useState(null);
-    const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [loadingText, setLoadingText] = useState("");
+    const [error, setError] = useState(null);
+    const [loadingText, setLoadingText] = useState('');
 
     const handleGenerateForm = async () => {
         setLoading(true);
-        setLoadingText(loadingTexts[Math.floor(Math.random() * loadingTexts.length)]);
+        setLoadingText(getRandomLoadingText());
         const openaiApiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 
         try {
@@ -35,7 +22,6 @@ const FormGenerator = () => {
                 'https://api.openai.com/v1/chat/completions',
                 {
                     model: 'gpt-3.5-turbo',
-                    temperature: 0,
                     messages: [
                         {
                             role: 'system',
@@ -43,9 +29,10 @@ const FormGenerator = () => {
                         },
                         {
                             role: 'user',
-                            content : `Generate a JSON schema for a form with ${numFields} fields based on the following description: ${prompt}`
+                            content : `Generate a JSON schema for a form with ${numFields} fields based on the following description: ${prompt}the questions in the form should be meaningful and should not contain the words question 1, question 2, etc. You can include fields like name, email, phone number, address, etc. The form should be easy to fill out.`
                         }
-                    ]
+                    ],
+                    temperature: 0
                 },
                 {
                     headers: {
@@ -73,17 +60,35 @@ const FormGenerator = () => {
             setLoading(false);
         }
     };
+
+    const getRandomLoadingText = () => {
+        const loadingTexts = [
+            'Loading...',
+            'Fetching data...',
+            'Hold on, I\'m thinking...',
+            'Just a moment...',
+            'Working on it...',
+            'One moment please...',
+            'Almost there...',
+            'Getting the data...',
+            'Just a sec...',
+        ];
+        return loadingTexts[Math.floor(Math.random() * loadingTexts.length)];
+    };
+
     const handleNumFieldsChange = (e) => {
         const value = parseInt(e.target.value);
-            setNumFields(value);
-    }
+        setNumFields(value);
+    };
 
     const renderForm = () => {
         if (!formSchema || !formSchema.properties) {
             return null;
         }
 
-        return Object.keys(formSchema.properties).map((key, index) => {
+        const fieldsToShow = Object.keys(formSchema.properties).slice(0, numFields);
+
+        return fieldsToShow.map((key, index) => {
             const field = formSchema.properties[key];
             const isRequired = formSchema.required.includes(key);
 
@@ -104,7 +109,7 @@ const FormGenerator = () => {
                         </div>
                     );
                 case 'number':
-                    case 'integer':
+                case 'integer':
                     return (
                         <div key={index} className={styles.formField}>
                             <label>{field.title}</label>
@@ -115,7 +120,14 @@ const FormGenerator = () => {
                     return (
                         <div key={index} className={styles.formField}>
                             <label>{field.title}</label>
-                            <input type="checkbox" name={key} required={isRequired} defaultChecked={false}/>
+                            <div className={styles.radioGroup}>
+                                <label>
+                                    <input type="radio" name={key} value="yes" /> Yes
+                                </label>
+                                <label>
+                                    <input type="radio" name={key} value="no" /> No
+                                </label>
+                            </div>
                         </div>
                     );
                 default:
@@ -127,34 +139,31 @@ const FormGenerator = () => {
     return (
         <div className={styles.container}>
             <h1 className={styles.title}>AI Form Generator</h1>
+            <div style={{width: "100%"}}>
             <textarea
                 className={styles.textarea}
                 value={prompt}
                 onChange={e => setPrompt(e.target.value)}
                 placeholder="Enter form description"
             ></textarea>
+            </div>
+            
             <div className={styles.inputContainer}>
                 <label className={styles.label}>
-                    Number of fields:
+                    Number of Fields:
                     <input
                         type="number"
                         value={numFields}
                         onChange={handleNumFieldsChange}
                         min={1}
-                        max={Object.keys(formSchema?.properties || {}).length || 10}
-                        className={styles.inputNumber}
+                        max={numFields || 10}
                     />
                 </label>
                 <button className={styles.button} onClick={handleGenerateForm}>Generate Form</button>
             </div>
-            
             {loading && <p className={styles.loading}>{loadingText}</p>}
             {error && <p className={styles.error}>{error}</p>}
-            {formSchema && (
-                <form className={styles.form}>
-                    {renderForm()}
-                </form>
-            )}
+            {formSchema && <form className={styles.form}>{renderForm()}</form>}
         </div>
     );
 };
