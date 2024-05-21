@@ -175,23 +175,7 @@ const handleChange = (e) => {
             </div>
             {loading && <p className={styles.loading}>{loadingText}</p>}
             {error && <p className={styles.error}>{error}</p>}
-                {formSchema && (
-                    <div>
-                        <button className={styles.button} onClick={() => setIsEditing(!isEditing)}>
-                            {isEditing ? 'Preview Form' : 'Edit Form'}
-                        </button>
-                        {isEditing ? (
-                            <form className={styles.form}>
-                                {renderForm()}
-                            </form>
-                        ) : (
-                            <div className={styles.preview}>
-                                <h2>Form Preview</h2>
-                                {renderForm()}
-                            </div>
-                        )}
-                    </div>
-                )}
+            {formSchema && <form className={styles.form}>{renderForm()}</form>}
         </div>
     );
 };
