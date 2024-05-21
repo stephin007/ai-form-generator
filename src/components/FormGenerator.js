@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
-import styles from './FormGenerator.module.css';
+import styles from '../styles/FormGenerator.module.css';
 
 const FormGenerator = () => {
     const [prompt, setPrompt] = useState('');
@@ -11,6 +11,8 @@ const FormGenerator = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [loadingText, setLoadingText] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
+    const [formData, setFormData] = useState({});
 
     const handleGenerateForm = async () => {
         setLoading(true);
@@ -81,6 +83,16 @@ const FormGenerator = () => {
         setNumFields(value);
     };
 
+
+const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+        ...formData,
+        [name]: value
+    });
+    console.log(formData);
+};
+
     const renderForm = () => {
         if (!formSchema || !formSchema.properties) {
             return null;
@@ -98,14 +110,14 @@ const FormGenerator = () => {
                         return (
                             <div key={index} className={styles.formField}>
                                 <label>{field.title}</label>
-                                <input type="email" name={key} required={isRequired} minLength={field.minLength} maxLength={field.maxLength} />
+                                <input type="email" name={key} required={isRequired} minLength={field.minLength} maxLength={field.maxLength} onChange={handleChange} />
                             </div>
                         );
                     }
                     return (
                         <div key={index} className={styles.formField}>
                             <label>{field.title}</label>
-                            <input type="text" name={key} required={isRequired} minLength={field.minLength} maxLength={field.maxLength} />
+                            <input type="text" name={key} required={isRequired} minLength={field.minLength} maxLength={field.maxLength} onChange={handleChange}/>
                         </div>
                     );
                 case 'number':
@@ -113,7 +125,7 @@ const FormGenerator = () => {
                     return (
                         <div key={index} className={styles.formField}>
                             <label>{field.title}</label>
-                            <input type="number" name={key} required={isRequired} min={field.minimum} max={field.maximum} />
+                            <input type="number" name={key} required={isRequired} min={field.minimum} max={field.maximum} onChange={handleChange}/>
                         </div>
                     );
                 case 'boolean':
@@ -122,10 +134,10 @@ const FormGenerator = () => {
                             <label>{field.title}</label>
                             <div className={styles.radioGroup}>
                                 <label>
-                                    <input type="radio" name={key} value="yes" /> Yes
+                                    <input type="radio" name={key} value="yes" onChange={handleChange} /> Yes
                                 </label>
                                 <label>
-                                    <input type="radio" name={key} value="no" /> No
+                                    <input type="radio" name={key} value="no" onChange={handleChange}/> No
                                 </label>
                             </div>
                         </div>
@@ -163,7 +175,23 @@ const FormGenerator = () => {
             </div>
             {loading && <p className={styles.loading}>{loadingText}</p>}
             {error && <p className={styles.error}>{error}</p>}
-            {formSchema && <form className={styles.form}>{renderForm()}</form>}
+                {formSchema && (
+                    <div>
+                        <button className={styles.button} onClick={() => setIsEditing(!isEditing)}>
+                            {isEditing ? 'Preview Form' : 'Edit Form'}
+                        </button>
+                        {isEditing ? (
+                            <form className={styles.form}>
+                                {renderForm()}
+                            </form>
+                        ) : (
+                            <div className={styles.preview}>
+                                <h2>Form Preview</h2>
+                                {renderForm()}
+                            </div>
+                        )}
+                    </div>
+                )}
         </div>
     );
 };
