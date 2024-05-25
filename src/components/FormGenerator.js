@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import styles from '../styles/FormGenerator.module.css';
 
+const GOOGLE_APPS_SCRIPT_URL = process.env.GOOGLE_APPS_SCRIPT_URL;
+
 const FormGenerator = () => {
     const [prompt, setPrompt] = useState('');
     const [numFields, setNumFields] = useState(5); // Default number of fields
@@ -11,8 +13,9 @@ const FormGenerator = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [loadingText, setLoadingText] = useState('');
-    const [isEditing, setIsEditing] = useState(false);
+    const [fields, setFields] = useState(false);
     const [formData, setFormData] = useState({});
+    const [message, setMessage] = useState('');
 
     const handleGenerateForm = async () => {
         setLoading(true);
@@ -90,8 +93,53 @@ const handleChange = (e) => {
         ...formData,
         [name]: value
     });
+    
+    if(name === "rating" & value > 3){
+        setFields({...fields, feedback: schema.properties.feedback });
+    } else if(name === "rating" & value <= 3){
+        const {feedback, ...rest} = fields;
+            setFields(rest);
+    }
     console.log(formData);
-};
+    };
+
+    const exportToJSON = () => {
+        const data = {
+            ...formData
+        };
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'form-data.json';
+        a.click();
+    }
+
+    const exportToCSV = () => {
+        const csvRows = [
+            ["Field Name", "Type", "Title", "Min Length", "Max Length", "Minimum", "Maximum"],
+            ...Object.keys(formData).map(key => {
+                const field = formSchema.properties[key];
+                return [
+                    key,
+                    field.type,
+                    field.title,
+                    field.minLength,
+                    field.maxLength,
+                    field.minimum,
+                    field.maximum
+                ];
+            })
+        ];
+        const csv = csvRows.map(row => row.join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'form-data.csv';
+        a.click();
+    }
 
     const renderForm = () => {
         if (!formSchema || !formSchema.properties) {
