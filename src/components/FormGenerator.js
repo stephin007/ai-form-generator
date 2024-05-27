@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import styles from '../styles/FormGenerator.module.css';
 
-const GOOGLE_APPS_SCRIPT_URL = process.env.GOOGLE_APPS_SCRIPT_URL;
 
 const FormGenerator = () => {
     const [prompt, setPrompt] = useState('');
@@ -15,7 +14,6 @@ const FormGenerator = () => {
     const [loadingText, setLoadingText] = useState('');
     const [fields, setFields] = useState(false);
     const [formData, setFormData] = useState({});
-    const [message, setMessage] = useState('');
 
     const handleGenerateForm = async () => {
         setLoading(true);
@@ -102,19 +100,6 @@ const handleChange = (e) => {
     }
     console.log(formData);
     };
-
-    const exportToJSON = () => {
-        const data = {
-            ...formData
-        };
-        const json = JSON.stringify(data, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'form-data.json';
-        a.click();
-    }
 
     const exportToCSV = () => {
         const csvRows = [
@@ -224,6 +209,7 @@ const handleChange = (e) => {
             {loading && <p className={styles.loading}>{loadingText}</p>}
             {error && <p className={styles.error}>{error}</p>}
             {formSchema && <form className={styles.form}>{renderForm()}</form>}
+            {formSchema && <button className={styles.button} onClick={exportToCSV}>Export to CSV</button>}
         </div>
     );
 };
