@@ -104,7 +104,7 @@ const handleChange = (e) => {
     const exportToCSV = () => {
         const csvRows = [
             ["Field Name", "Type", "Title", "Min Length", "Max Length", "Minimum", "Maximum"],
-            ...Object.keys(formData).map(key => {
+            ...Object.keys(formSchema.properties).map(key => {
                 const field = formSchema.properties[key];
                 return [
                     key,
@@ -127,59 +127,58 @@ const handleChange = (e) => {
     }
 
     const renderForm = () => {
-        if (!formSchema || !formSchema.properties) {
-            return null;
+    if (!formSchema || !formSchema.properties) {
+        return null;
+    }
+
+    return Object.keys(formSchema.properties).map((key, index) => {
+        const field = formSchema.properties[key];
+        const isRequired = formSchema.required.includes(key);
+        const isDisabled = index >= numFields;
+
+        switch (field.type) {
+            case 'string':
+                if (field.format === 'email') {
+                    return (
+                        <div key={index} className={styles.formField}>
+                            <label>{field.title}</label>
+                            <input type="email" name={key} required={isRequired} minLength={field.minLength} maxLength={field.maxLength} onChange={handleChange} disabled={isDisabled} />
+                        </div>
+                    );
+                }
+                return (
+                    <div key={index} className={styles.formField}>
+                        <label>{field.title}</label>
+                        <input type="text" name={key} required={isRequired} minLength={field.minLength} maxLength={field.maxLength} onChange={handleChange} disabled={isDisabled} />
+                    </div>
+                );
+            case 'number':
+            case 'integer':
+                return (
+                    <div key={index} className={styles.formField}>
+                        <label>{field.title}</label>
+                        <input type="number" name={key} required={isRequired} min={field.minimum} max={field.maximum} onChange={handleChange} disabled={isDisabled} />
+                    </div>
+                );
+            case 'boolean':
+                return (
+                    <div key={index} className={styles.formField}>
+                        <label>{field.title}</label>
+                        <div className={styles.radioGroup}>
+                            <label>
+                                <input type="radio" name={key} value="yes" onChange={handleChange} disabled={isDisabled} /> Yes
+                            </label>
+                            <label>
+                                <input type="radio" name={key} value="no" onChange={handleChange} disabled={isDisabled} /> No
+                            </label>
+                        </div>
+                    </div>
+                );
+            default:
+                return null;
         }
-
-        const fieldsToShow = Object.keys(formSchema.properties).slice(0, numFields);
-
-        return fieldsToShow.map((key, index) => {
-            const field = formSchema.properties[key];
-            const isRequired = formSchema.required.includes(key);
-
-            switch (field.type) {
-                case 'string':
-                    if (field.format === 'email') {
-                        return (
-                            <div key={index} className={styles.formField}>
-                                <label>{field.title}</label>
-                                <input type="email" name={key} required={isRequired} minLength={field.minLength} maxLength={field.maxLength} onChange={handleChange} />
-                            </div>
-                        );
-                    }
-                    return (
-                        <div key={index} className={styles.formField}>
-                            <label>{field.title}</label>
-                            <input type="text" name={key} required={isRequired} minLength={field.minLength} maxLength={field.maxLength} onChange={handleChange}/>
-                        </div>
-                    );
-                case 'number':
-                case 'integer':
-                    return (
-                        <div key={index} className={styles.formField}>
-                            <label>{field.title}</label>
-                            <input type="number" name={key} required={isRequired} min={field.minimum} max={field.maximum} onChange={handleChange}/>
-                        </div>
-                    );
-                case 'boolean':
-                    return (
-                        <div key={index} className={styles.formField}>
-                            <label>{field.title}</label>
-                            <div className={styles.radioGroup}>
-                                <label>
-                                    <input type="radio" name={key} value="yes" onChange={handleChange} /> Yes
-                                </label>
-                                <label>
-                                    <input type="radio" name={key} value="no" onChange={handleChange}/> No
-                                </label>
-                            </div>
-                        </div>
-                    );
-                default:
-                    return null;
-            }
-        });
-    };
+    });
+};
 
     return (
         <div className={styles.container}>
@@ -201,15 +200,15 @@ const handleChange = (e) => {
                         value={numFields}
                         onChange={handleNumFieldsChange}
                         min={1}
-                        max={numFields || 10}
+                        max={20}
                     />
                 </label>
-                <button className={styles.button} onClick={handleGenerateForm}>Generate Form</button>
+                <button className={styles.button} onClick={handleGenerateForm} disabled={!prompt}>Generate Form</button>
             </div>
             {loading && <p className={styles.loading}>{loadingText}</p>}
             {error && <p className={styles.error}>{error}</p>}
             {formSchema && <form className={styles.form}>{renderForm()}</form>}
-            {formSchema && <button className={styles.button} onClick={exportToCSV}>Export to CSV</button>}
+            {formSchema && <button className={styles.exportButton} onClick={exportToCSV}>Export to CSV</button>}
         </div>
     );
 };
