@@ -207,8 +207,12 @@ const handleChange = (e) => {
             </div>
             {loading && <p className={styles.loading}>{loadingText}</p>}
             {error && <p className={styles.error}>{error}</p>}
-            {formSchema && <form className={styles.form}>{renderForm()}</form>}
-            {formSchema && <button className={styles.exportButton} onClick={exportToCSV}>Export to CSV</button>}
+            {formSchema && (
+                <div className={styles.formContainer}>
+                    <form className={styles.form}>{renderForm()}</form>
+                    <button className={styles.exportButton} onClick={exportToCSV}>Export to CSV</button>
+                </div>
+            )}
         </div>
     );
 };
