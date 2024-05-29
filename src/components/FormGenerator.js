@@ -4,21 +4,36 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import styles from '../styles/FormGenerator.module.css';
 
-
 const FormGenerator = () => {
-    const [prompt, setPrompt] = useState('');
-    const [numFields, setNumFields] = useState(5); // Default number of fields
+    const [currentStep, setCurrentStep] = useState(1);
+    const [formType, setFormType] = useState('');
+    const [numFields, setNumFields] = useState(5);
+    const [formDescription, setFormDescription] = useState('');
     const [formSchema, setFormSchema] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [loadingText, setLoadingText] = useState('');
-    const [fields, setFields] = useState(false);
     const [formData, setFormData] = useState({});
+
+    const handleNextStep = () => {
+        setCurrentStep(currentStep + 1);
+    };
+
+    const handlePreviousStep = () => {
+        setCurrentStep(currentStep - 1);
+    };
 
     const handleGenerateForm = async () => {
         setLoading(true);
         setLoadingText(getRandomLoadingText());
         const openaiApiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+
+        const prompt = `
+            Generate a JSON schema for a ${formType} form with ${numFields} fields.
+            Form Description: ${formDescription}.
+            The questions in the form should be meaningful and should not contain the words question 1, question 2, etc.
+            The form should be easy to fill out.
+        `;
 
         try {
             const response = await axios.post(
@@ -32,7 +47,7 @@ const FormGenerator = () => {
                         },
                         {
                             role: 'user',
-                            content : `Generate a JSON schema for a form with ${numFields} fields based on the following description: ${prompt}the questions in the form should be meaningful and should not contain the words question 1, question 2, etc. You can include fields like name, email, phone number, address, etc. The form should be easy to fill out.`
+                            content: prompt
                         }
                     ],
                     temperature: 0
@@ -51,7 +66,7 @@ const FormGenerator = () => {
                     setFormSchema(formSchema);
                     setError(null);
                 } catch (jsonError) {
-                    setError('Looks like you did not enter a valid form description. Please try again.');
+                    setError('Invalid form description. Please try again.');
                 }
             } else {
                 setError('Invalid response from OpenAI');
@@ -66,39 +81,26 @@ const FormGenerator = () => {
 
     const getRandomLoadingText = () => {
         const loadingTexts = [
-            'Loading...',
-            'Fetching data...',
-            'Hold on, I\'m thinking...',
+            'Generating your form...',
+            'Creating form fields...',
+            'Almost ready...',
             'Just a moment...',
-            'Working on it...',
-            'One moment please...',
-            'Almost there...',
-            'Getting the data...',
-            'Just a sec...',
+            'Hang tight, preparing your form...',
         ];
         return loadingTexts[Math.floor(Math.random() * loadingTexts.length)];
     };
 
-    const handleNumFieldsChange = (e) => {
-        const value = parseInt(e.target.value);
-        setNumFields(value);
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
     };
 
-
-const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-        ...formData,
-        [name]: value
-    });
-    
-    if(name === "rating" & value > 3){
-        setFields({...fields, feedback: schema.properties.feedback });
-    } else if(name === "rating" & value <= 3){
-        const {feedback, ...rest} = fields;
-            setFields(rest);
-    }
-    console.log(formData);
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        console.log('Form submitted:', formData);
     };
 
     const exportToCSV = () => {
@@ -127,90 +129,140 @@ const handleChange = (e) => {
     }
 
     const renderForm = () => {
-    if (!formSchema || !formSchema.properties) {
-        return null;
-    }
+        if (!formSchema || !formSchema.properties) {
+            return null;
+        }
 
-    return Object.keys(formSchema.properties).map((key, index) => {
-        const field = formSchema.properties[key];
-        const isRequired = formSchema.required.includes(key);
-        const isDisabled = index >= numFields;
+        return (
+            <form className={styles.form} onSubmit={handleSubmit}>
+                <div className={styles.gridContainer}>
+                    {Object.keys(formSchema.properties).map((key, index) => {
+                        const field = formSchema.properties[key];
+                        const isRequired = formSchema.required.includes(key);
 
-        switch (field.type) {
-            case 'string':
-                if (field.format === 'email') {
-                    return (
-                        <div key={index} className={styles.formField}>
-                            <label>{field.title}</label>
-                            <input type="email" name={key} required={isRequired} minLength={field.minLength} maxLength={field.maxLength} onChange={handleChange} disabled={isDisabled} />
-                        </div>
-                    );
-                }
+                        switch (field.type) {
+                            case 'string':
+                                if (field.format === 'email') {
+                                    return (
+                                        <div key={index} className={styles.formField}>
+                                            <label>{field.title}</label>
+                                            <input type="email" name={key} required={isRequired} minLength={field.minLength} maxLength={field.maxLength} onChange={handleChange} className={styles.input} />
+                                        </div>
+                                    );
+                                }
+                                return (
+                                    <div key={index} className={styles.formField}>
+                                        <label>{field.title}</label>
+                                        <input type="text" name={key} required={isRequired} minLength={field.minLength} maxLength={field.maxLength} onChange={handleChange} className={styles.input} />
+                                    </div>
+                                );
+                            case 'number':
+                            case 'integer':
+                                return (
+                                    <div key={index} className={styles.formField}>
+                                        <label>{field.title}</label>
+                                        <input type="number" name={key} required={isRequired} min={field.minimum} max={field.maximum} onChange={handleChange} className={styles.input} />
+                                    </div>
+                                );
+                            case 'boolean':
+                                return (
+                                    <div key={index} className={styles.formField}>
+                                        <label>{field.title}</label>
+                                        <div className={styles.radioGroup}>
+                                            <label>
+                                                <input type="radio" name={key} value="true" onChange={handleChange} /> Yes
+                                            </label>
+                                            <label>
+                                                <input type="radio" name={key} value="false" onChange={handleChange} /> No
+                                            </label>
+                                        </div>
+                                    </div>
+                                );
+                            default:
+                                return null;
+                        }
+                    })}
+                </div>
+                <button type="submit" className={styles.exportButton} onClick={exportToCSV}>Export to CSV</button>
+            </form>
+        );
+    };
+
+    const renderStep = () => {
+        switch (currentStep) {
+            case 1:
                 return (
-                    <div key={index} className={styles.formField}>
-                        <label>{field.title}</label>
-                        <input type="text" name={key} required={isRequired} minLength={field.minLength} maxLength={field.maxLength} onChange={handleChange} disabled={isDisabled} />
+                    <div>
+                        <h2>Step 1: Select Form Type</h2>
+                        <input
+                            type="text"
+                            value={formType}
+                            onChange={(e) => setFormType(e.target.value)}
+                            placeholder="Enter the type of form (e.g., Registration, Feedback)"
+                            className={styles.input}
+                        />
+                        <button className={`${styles.button} ${!formType ? styles.disabledButton : ''}`}
+                                onClick={handleNextStep}
+                                disabled={!formType}>Next</button>
                     </div>
                 );
-            case 'number':
-            case 'integer':
+            case 2:
                 return (
-                    <div key={index} className={styles.formField}>
-                        <label>{field.title}</label>
-                        <input type="number" name={key} required={isRequired} min={field.minimum} max={field.maximum} onChange={handleChange} disabled={isDisabled} />
+                    <div>
+                        <h2>Step 2: Number of Fields</h2>
+                        <input
+                            type="number"
+                            value={numFields}
+                            onChange={(e) => setNumFields(e.target.value)}
+                            min={1}
+                            max={20}
+                            className={styles.input}
+                        />
+                        <button className={styles.button} onClick={handlePreviousStep}>Previous</button>
+                        <button className={styles.button} onClick={handleNextStep}>Next</button>
                     </div>
                 );
-            case 'boolean':
+            case 3:
                 return (
-                    <div key={index} className={styles.formField}>
-                        <label>{field.title}</label>
-                        <div className={styles.radioGroup}>
-                            <label>
-                                <input type="radio" name={key} value="yes" onChange={handleChange} disabled={isDisabled} /> Yes
-                            </label>
-                            <label>
-                                <input type="radio" name={key} value="no" onChange={handleChange} disabled={isDisabled} /> No
-                            </label>
-                        </div>
+                    <div>
+                        <h2>Step 3: Form Description</h2>
+                        <textarea
+                            value={formDescription}
+                            onChange={(e) => setFormDescription(e.target.value)}
+                            placeholder="Enter a description of the form's purpose or the type of questions (e.g., Collecting user feedback on a new product)"
+                            className={styles.textarea}
+                        ></textarea>
+                        <button className={styles.button} onClick={handlePreviousStep}>Previous</button>
+                        <button className={`${styles.button} ${!formDescription ? styles.disabledButton : ''}`}
+                                onClick={handleNextStep}
+                                disabled={!formDescription}>Next</button>
+                    </div>
+                );
+            case 4:
+                return (
+                    <div>
+                        <h2>Step 4: Confirm and Generate</h2>
+                        <p><strong>Form Type:</strong> {formType}</p>
+                        <p><strong>Number of Fields:</strong> {numFields}</p>
+                        <p><strong>Form Description:</strong> {formDescription}</p>
+                        <button className={styles.button} onClick={handlePreviousStep}>Previous</button>
+                        <button className={styles.button} onClick={handleGenerateForm}>Generate Form</button>
                     </div>
                 );
             default:
                 return null;
         }
-    });
-};
+    };
 
     return (
         <div className={styles.container}>
             <h1 className={styles.title}>AI Form Generator</h1>
-            <div style={{width: "100%"}}>
-            <textarea
-                className={styles.textarea}
-                value={prompt}
-                onChange={e => setPrompt(e.target.value)}
-                placeholder="Enter form description"
-            ></textarea>
-            </div>
-            
-            <div className={styles.inputContainer}>
-                <label className={styles.label}>
-                    Number of Fields:
-                    <input
-                        type="number"
-                        value={numFields}
-                        onChange={handleNumFieldsChange}
-                        min={1}
-                        max={20}
-                    />
-                </label>
-                <button className={styles.button} onClick={handleGenerateForm} disabled={!prompt}>Generate Form</button>
-            </div>
             {loading && <p className={styles.loading}>{loadingText}</p>}
             {error && <p className={styles.error}>{error}</p>}
-            {formSchema && (
+            {!loading && renderStep()}
+            {currentStep === 4 && formSchema && (
                 <div className={styles.formContainer}>
-                    <form className={styles.form}>{renderForm()}</form>
-                    <button className={styles.exportButton} onClick={exportToCSV}>Export to CSV</button>
+                    {renderForm()}
                 </div>
             )}
         </div>
