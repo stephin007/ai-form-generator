@@ -6,7 +6,7 @@ import {
     AppBar, Toolbar, Typography, Container, TextField, Button, CircularProgress,
     Stepper, Step, StepLabel, Box, FormControlLabel, Radio, RadioGroup,
     FormLabel, FormControl, Grid, Paper, Snackbar, Alert, Divider, createTheme,
-    ThemeProvider, CssBaseline
+    ThemeProvider, CssBaseline, InputLabel, Select, MenuItem
 } from '@mui/material';
 import { teal, grey, purple } from '@mui/material/colors';
 
@@ -37,6 +37,26 @@ const theme = createTheme({
 
 const steps = ['Choose Form Type', 'Set Number of Fields', 'Describe Your Form', 'Review and Generate'];
 
+const predefinedFormTypes = [
+    'Registration',
+    'Feedback',
+    'Survey',
+    'Application',
+    'Contact Us',
+    'Order Form',
+    'Subscription',
+    'Login',
+    'Job Application',
+    'Event RSVP',
+    'Product Review',
+    'Support Ticket',
+    'Newsletter Signup',
+    'Poll',
+    'Appointment Booking',
+    'User Profile',
+    'Contest Entry',
+];
+
 const FormGenerator = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [formType, setFormType] = useState('');
@@ -45,8 +65,23 @@ const FormGenerator = () => {
     const [formSchema, setFormSchema] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
     const [loadingText, setLoadingText] = useState('');
     const [formData, setFormData] = useState({});
+    const [formDescriptionError, setFormDescriptionError] = useState('');
+    const [customFormType, setCustomFormType] = useState('');
+    const [isCustom, setIsCustom] = useState(false);
+
+    const handleFormTypeChange = (e) => {
+        const value = e.target.value;
+        if (value === 'custom') {
+            setIsCustom(true);
+            setFormType('');
+        } else {
+            setIsCustom(false);
+            setFormType(value);
+        }
+    };
 
     const handleNextStep = () => {
         setCurrentStep(currentStep + 1);
@@ -104,6 +139,7 @@ const FormGenerator = () => {
                     const formSchema = JSON.parse(response.data.choices[0].message.content.trim());
                     setFormSchema(formSchema);
                     setError(null);
+                    setSuccess("Form generated successfully!");
                 } catch (jsonError) {
                     setError('The generated JSON is malformed.');
                 }
@@ -255,7 +291,7 @@ const FormGenerator = () => {
             case 0:
                 return (
                     <Box>
-                        <TextField
+                        {/* <TextField
                             label="Form Type"
                             value={formType}
                             onChange={(e) => setFormType(e.target.value)}
@@ -263,7 +299,34 @@ const FormGenerator = () => {
                             fullWidth
                             margin="normal"
                             variant="outlined"
-                        />
+                        /> */}
+                         <FormControl fullWidth margin="normal" variant="outlined">
+                <InputLabel>Form Type</InputLabel>
+                <Select
+                    value={isCustom ? 'custom' : formType}
+                    onChange={handleFormTypeChange}
+                    label="Form Type"
+                >
+                    <MenuItem value="custom">Add Custom</MenuItem>
+                    {predefinedFormTypes.map((type) => (
+                        <MenuItem key={type} value={type}>
+                            {type}
+                        </MenuItem>
+                    ))}
+                    
+                </Select>
+            </FormControl>
+            {isCustom && (
+                <TextField
+                    label="Custom Form Type"
+                    value={customFormType}
+                    onChange={(e) => setCustomFormType(e.target.value)}
+                    placeholder="Enter the custom form type"
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                />
+            )}
                     </Box>
                 );
             case 1:
@@ -285,7 +348,7 @@ const FormGenerator = () => {
                 return (
                     <Box>
                         <TextField
-                            label="Form Description"
+                            label="Form Description(Atleast 15 characters)"
                             value={formDescription}
                             onChange={(e) => setFormDescription(e.target.value)}
                             placeholder="Enter a description of the form's purpose or the type of questions (e.g., Collecting user feedback on a new product)"
@@ -341,10 +404,12 @@ const FormGenerator = () => {
                                             Back
                                         </Button>
                                     )}
+                                    
                                     {currentStep < steps.length - 1 && (
-                                        <Button onClick={handleNextStep} variant="contained" color="primary" style={{ marginLeft: '8px' }}>
-                                            Next
+                                        <Button onClick={handleNextStep} disabled={(currentStep === 0 && !formType) || (currentStep === 2 && (!formDescription || formDescription.length < 15))} variant="contained" color="primary" style={{ marginLeft: '8px' }}>
+                                            Next 
                                         </Button>
+                                        
                                     )}
                                     {currentStep === steps.length - 1 && (
                                         <Button onClick={handleGenerateForm} variant="contained" color="primary" style={{ marginLeft: '8px' }}>
@@ -352,7 +417,28 @@ const FormGenerator = () => {
                                         </Button>
                                     )}
                                 </Box>
-                                {loading && <CircularProgress style={{ marginTop: '16px' }} />}
+                                
+                                
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            
+                                <Paper elevation={3} style={{ padding: '24px' }}>
+                                <Typography variant="h5" gutterBottom>Form Preview</Typography>
+                                <Divider style={{ marginBottom: '16px' }} />
+                                {loading && (
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '16px' }}>
+                                        <CircularProgress />
+                                        <Typography variant="body1" style={{ marginLeft: '8px' }}>{loadingText}</Typography>
+                                    </div>
+                                )}
+                                {success && (
+                                    <Snackbar open autoHideDuration={6000} onClose={() => setSuccess(null)}>
+                                        <Alert onClose={() => setSuccess(null)} severity="success">
+                                            {success}
+                                        </Alert>
+                                    </Snackbar>
+                                )}
                                 {error && (
                                     <Snackbar open autoHideDuration={6000} onClose={() => setError(null)}>
                                         <Alert onClose={() => setError(null)} severity="error">
@@ -360,22 +446,24 @@ const FormGenerator = () => {
                                         </Alert>
                                     </Snackbar>
                                 )}
-                            </Paper>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            {currentStep === 3 && formSchema && (
-                                <Paper elevation={3} style={{ padding: '24px' }}>
-                                <Typography variant="h5" gutterBottom>Form Preview</Typography>
-                                <Divider style={{ marginBottom: '16px' }} />
                                 {formSchema ? (
                                     renderForm()
                                 ) : (
-                                    <Typography variant="body1" color="textSecondary">
-                                        Your form preview will appear here once generated.
-                                    </Typography>
+                                    <>
+                                    {
+                                        !loading && (
+                                            <Typography variant="body1" color="textSecondary">
+                                                Your form preview will appear here once generated.
+                                            </Typography>
+                                        )
+                                    }
+                                    </>
+                                    // <Typography variant="body1" color="textSecondary">
+                                    //     Your form preview will appear here once generated.
+                                    // </Typography>
                                 )}
                             </Paper>
-                            )}
+                        
                             
                         </Grid>
                     </Grid>
