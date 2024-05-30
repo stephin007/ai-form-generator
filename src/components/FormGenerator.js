@@ -68,7 +68,6 @@ const FormGenerator = () => {
     const [success, setSuccess] = useState(null);
     const [loadingText, setLoadingText] = useState('');
     const [formData, setFormData] = useState({});
-    const [formDescriptionError, setFormDescriptionError] = useState('');
     const [customFormType, setCustomFormType] = useState('');
     const [isCustom, setIsCustom] = useState(false);
 
@@ -317,7 +316,8 @@ const FormGenerator = () => {
                     margin="normal"
                     variant="outlined"
                 />
-            )}
+                
+            )} 
                     </Box>
                 );
             case 1:
@@ -397,8 +397,9 @@ const FormGenerator = () => {
                                     )}
                                     
                                     {currentStep < steps.length - 1 && (
-                                        <Button onClick={handleNextStep} disabled={(currentStep === 0 && !formType) || (currentStep === 2 && (!formDescription || formDescription.length < 15))} variant="contained" color="primary" style={{ marginLeft: '8px' }}>
-                                            Next 
+
+                                        <Button onClick={handleNextStep} disabled={(currentStep === 0 && (isCustom && !customFormType)) || (!isCustom && !formType) || (currentStep === 2 && (!formDescription || formDescription.length < 15))} variant="contained" color="primary" style={{ marginLeft: '8px' }}>
+                                            Next
                                         </Button>
                                         
                                     )}
@@ -449,9 +450,6 @@ const FormGenerator = () => {
                                         )
                                     }
                                     </>
-                                    // <Typography variant="body1" color="textSecondary">
-                                    //     Your form preview will appear here once generated.
-                                    // </Typography>
                                 )}
                             </Paper>
                         
