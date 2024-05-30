@@ -98,11 +98,6 @@ const FormGenerator = () => {
         });
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('Form submitted:', formData);
-    };
-
     const exportToCSV = () => {
         const csvRows = [
             ["Field Name", "Type", "Title", "Min Length", "Max Length", "Minimum", "Maximum"],
@@ -134,7 +129,7 @@ const FormGenerator = () => {
         }
 
         return (
-            <form className={styles.form} onSubmit={handleSubmit}>
+            <form className={styles.form} >
                 <div className={styles.gridContainer}>
                     {Object.keys(formSchema.properties).map((key, index) => {
                         const field = formSchema.properties[key];
