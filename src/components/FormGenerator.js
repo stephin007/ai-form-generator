@@ -291,15 +291,6 @@ const FormGenerator = () => {
             case 0:
                 return (
                     <Box>
-                        {/* <TextField
-                            label="Form Type"
-                            value={formType}
-                            onChange={(e) => setFormType(e.target.value)}
-                            placeholder="Enter the type of form (e.g., Registration, Feedback)"
-                            fullWidth
-                            margin="normal"
-                            variant="outlined"
-                        /> */}
                          <FormControl fullWidth margin="normal" variant="outlined">
                 <InputLabel>Form Type</InputLabel>
                 <Select
@@ -378,12 +369,12 @@ const FormGenerator = () => {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <Box display="flex" flexDirection="column" minHeight="100vh">
-                <AppBar position="static">
+                <AppBar position="fixed">
                     <Toolbar>
                         <Typography variant="h6">Formify AI</Typography>
                     </Toolbar>
                 </AppBar>
-                <Container maxWidth="lg" style={{ flex: 1, display: 'flex', marginTop: '24px' }}>
+                <Container maxWidth="lg" style={{ flex: 1, display: 'flex', marginTop: '80px' }}>
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={6}>
                             <Paper elevation={3} style={{ padding: '24px' }}>
