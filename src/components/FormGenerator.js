@@ -355,7 +355,7 @@ const FormGenerator = () => {
                 return (
                     <Box>
                         <Divider style={{ marginBottom: '16px' }} />
-                        <Typography><strong>Form Type:</strong> {formType}</Typography>
+                        <Typography><strong>Form Type:</strong> {formType || customFormType}</Typography>
                         <Typography><strong>Number of Fields:</strong> {numFields}</Typography>
                         <Typography><strong>Form Description:</strong> {formDescription}</Typography>
                     </Box>
