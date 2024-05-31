@@ -9,6 +9,7 @@ import {
     ThemeProvider, CssBaseline, InputLabel, Select, MenuItem
 } from '@mui/material';
 import { teal, grey, purple } from '@mui/material/colors';
+import { render } from 'react-dom';
 
 const theme = createTheme({
     palette: {
@@ -90,7 +91,7 @@ const FormGenerator = () => {
         setCurrentStep(currentStep - 1);
     };
 
-    const handleGenerateForm = async () => {
+    const handleGenerateForm = async (selectedTemplate = null) => {
         setLoading(true);
         setLoadingText(getRandomLoadingText());
         const openaiApiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
@@ -101,9 +102,13 @@ const FormGenerator = () => {
             return;
         }
 
+        const formTypeToUse = selectedTemplate ? selectedTemplate.formType : (formType || customFormType);
+        const numFieldsToUse = selectedTemplate ? selectedTemplate.numFields : numFields;
+        const formDescriptionToUse = selectedTemplate ? selectedTemplate.formDescription : formDescription;
+
         const prompt = `
-            Create a JSON schema for a ${formType} form with ${numFields} fields.
-            Form Description: ${formDescription}.
+            Create a JSON schema for a ${formTypeToUse} form with ${numFieldsToUse} fields.
+            Form Description: ${formDescriptionToUse}.
             The questions should be meaningful and not contain placeholders like question 1, question 2, etc.
             The form should be user-friendly.
         `;
@@ -291,33 +296,31 @@ const FormGenerator = () => {
                 return (
                     <Box>
                          <FormControl fullWidth margin="normal" variant="outlined">
-                <InputLabel>Form Type</InputLabel>
-                <Select
-                    value={isCustom ? 'custom' : formType}
-                    onChange={handleFormTypeChange}
-                    label="Form Type"
-                >
-                    <MenuItem value="custom">Add Custom</MenuItem>
-                    {predefinedFormTypes.map((type) => (
-                        <MenuItem key={type} value={type}>
-                            {type}
-                        </MenuItem>
-                    ))}
-                    
-                </Select>
-            </FormControl>
-            {isCustom && (
-                <TextField
-                    label="Custom Form Type"
-                    value={customFormType}
-                    onChange={(e) => setCustomFormType(e.target.value)}
-                    placeholder="Enter the custom form type"
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                />
-                
-            )} 
+                            <InputLabel>Form Type</InputLabel>
+                            <Select
+                                value={isCustom ? 'custom' : formType}
+                                onChange={handleFormTypeChange}
+                                label="Form Type"
+                            >
+                                <MenuItem value="custom">Add Custom</MenuItem>
+                                {predefinedFormTypes.map((type) => (
+                                    <MenuItem key={type} value={type}>
+                                        {type}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        {isCustom && (
+                            <TextField
+                                label="Custom Form Type"
+                                value={customFormType}
+                                onChange={(e) => setCustomFormType(e.target.value)}
+                                placeholder="Enter the custom form type"
+                                fullWidth
+                                margin="normal"
+                                variant="outlined"
+                            />
+                        )} 
                     </Box>
                 );
             case 1:
@@ -339,7 +342,7 @@ const FormGenerator = () => {
                 return (
                     <Box>
                         <TextField
-                            label="Form Description(Atleast 15 characters)"
+                            label="Form Description (At least 15 characters)"
                             value={formDescription}
                             onChange={(e) => setFormDescription(e.target.value)}
                             placeholder="Enter a description of the form's purpose or the type of questions (e.g., Collecting user feedback on a new product)"
@@ -363,6 +366,63 @@ const FormGenerator = () => {
             default:
                 return null;
         }
+    };
+
+    const templates = [
+        { formType: 'Registration', numFields: 5, formDescription: 'User registration form for a new website' },
+        { formType: 'Feedback', numFields: 4, formDescription: 'Feedback form to gather user opinions on a product' },
+        { formType: 'Survey', numFields: 10, formDescription: 'Survey form to collect data on user preferences' },
+        { formType: 'Application', numFields: 8, formDescription: 'Application form for a job or program' },
+        { formType: 'Contact Us', numFields: 6, formDescription: 'Contact form for users to reach out to support' },
+        { formType: 'Order Form', numFields: 7, formDescription: 'Order form for purchasing products or services' },
+        { formType: 'Subscription', numFields: 5, formDescription: 'Subscription form for users to sign up for updates' },
+        { formType: 'Login', numFields: 2, formDescription: 'Login form for users to access their accounts' },
+        { formType: 'Job Application', numFields: 9, formDescription: 'Job application form for candidates to apply' },
+        { formType: 'Event RSVP', numFields: 3, formDescription: 'Event RSVP form for attendees to confirm their presence' },
+        { formType: 'Product Review', numFields: 6, formDescription: 'Product review form for users to share feedback' },
+        { formType: 'Support Ticket', numFields: 5, formDescription: 'Support ticket form for users to report issues' },
+        { formType: 'Newsletter Signup', numFields: 3, formDescription: 'Newsletter signup form for users to subscribe' },
+        { formType: 'Poll', numFields: 4, formDescription: 'Poll form to gather opinions on a specific topic' },
+        { formType: 'Appointment Booking', numFields: 6, formDescription: 'Appointment booking form for scheduling meetings' },
+        { formType: 'User Profile', numFields: 7, formDescription: 'User profile form for updating personal information' },
+        { formType: 'Contest Entry', numFields: 5, formDescription: 'Contest entry form for participating in a competition' }
+
+    ];
+
+    const renderTemplates = () => {
+        if (currentStep !== 0) {
+            return null;
+        }
+        return (
+            <Box mt={3} style={{ overflowY: 'scroll', maxHeight: '400px' }}>
+                <Typography variant="h5" gutterBottom style={{ position: 'sticky', top: 0, backgroundColor: 'white', padding: "10px", zIndex: 1 }}>
+                    Need Help? Use a Template
+                </Typography>
+                <Divider style={{ marginBottom: '16px' }} />
+                <Grid container spacing={2}>
+                {templates.map((template, index) => (
+    <Grid item xs={12} sm={6} md={4} key={index}>
+        <Paper elevation={2} style={{ padding: '16px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+                <Typography variant="h6">{template.formType} Template</Typography>
+                <Typography variant="body2"><strong>Number of Fields:</strong> {template.numFields}</Typography>
+                <Typography variant="body2"><strong>Description:</strong> {template.formDescription}</Typography>
+            </div>
+            <Button 
+                variant="contained" 
+                color="primary" 
+                style={{ marginTop: '16px' }} 
+                onClick={() => handleGenerateForm(template)}
+            >
+                Use Template
+            </Button>
+        </Paper>
+    </Grid>
+))}
+
+                </Grid>
+            </Box>
+        );
     };
 
     return (
@@ -412,6 +472,7 @@ const FormGenerator = () => {
                                 
                                 
                             </Paper>
+                            {renderTemplates()}
                         </Grid>
                         <Grid item xs={12} md={6}>
                             
