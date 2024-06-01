@@ -4,8 +4,8 @@ import {
     AppBar, Toolbar, Typography, Button, Container, Box, Grid, Paper, CssBaseline, IconButton
 } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { teal, grey } from '@mui/material/colors';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import Image from 'next/image';
 
 const theme = createTheme({
     palette: {
@@ -17,30 +17,48 @@ const theme = createTheme({
         },
         background: {
             default: '#f7f8fc',
+            paper: '#ffffff',
         },
     },
     typography: {
         h1: {
             fontWeight: 700,
-            fontSize: '3rem',
+            fontSize: '2.5rem',
             marginBottom: '1rem',
-            background: 'linear-gradient(90deg, #00c6ff, #0072ff)',
             WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            textAlign: 'center',
+            '@media (min-width:600px)': {
+                fontSize: '3rem',
+            },
         },
         h2: {
-            fontWeight: 500,
-            marginBottom: '0.5rem',
+            fontWeight: 600,
+            fontSize: '1.5rem',
             color: '#0072ff',
+            marginBottom: '1rem',
+            textAlign: 'center',
+            '@media (min-width:600px)': {
+                fontSize: '2rem',
+            },
         },
         h3: {
             fontWeight: 500,
+            fontSize: '1.25rem',
+            color: '#333333',
             marginBottom: '0.5rem',
-            color: '#ff4e50',
+            textAlign: 'center',
+            '@media (min-width:600px)': {
+                fontSize: '1.5rem',
+            },
         },
         body1: {
-            fontSize: '1.2rem',
-            color: '#333',
+            fontSize: '0.875rem',
+            color: '#666666',
+            marginBottom: '1rem',
+            textAlign: 'center',
+            '@media (min-width:600px)': {
+                fontSize: '1rem',
+            },
         },
         button: {
             fontWeight: 700,
@@ -50,17 +68,23 @@ const theme = createTheme({
         MuiButton: {
             styleOverrides: {
                 root: {
-                    borderRadius: '30px',
+                    borderRadius: '8px',
                     textTransform: 'none',
-                    padding: '10px 30px',
+                    padding: '10px 20px',
                 },
                 containedPrimary: {
                     background: 'linear-gradient(90deg, #00c6ff, #0072ff)',
                     color: '#fff',
+                    '&:hover': {
+                        backgroundColor: '#005bb5',
+                    },
                 },
                 containedSecondary: {
                     background: 'linear-gradient(90deg, #ff4e50, #f9d423)',
                     color: '#fff',
+                    '&:hover': {
+                        backgroundColor: '#d84040',
+                    },
                 },
             },
         },
@@ -71,79 +95,97 @@ const LandingPage = () => {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <AppBar position="fixed" elevation={1} >
-                <Toolbar>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 700 }}>
-                        Formify AI
+            <AppBar position="fixed" elevation={1} sx={{ bgcolor: 'background.paper' }} style={{display: "flex", justifyContent: "space-between"}}>
+                <Toolbar >
+                    <div style={{display: "flex", alignItems: "center"}}>
+                    <img src="https://firebasestorage.googleapis.com/v0/b/cristomathewmemorial.appspot.com/o/1.png?alt=media&token=55b753f2-fc97-4768-b091-1d4020412920" alt="Logo" style={{ height: '60px' }} />
+                    <Typography variant="h6" component="div" sx={{ fontWeight: 700 }} color="secondary">
+                        FormifyAI
                     </Typography>
+                    </div>
+                    <div>
+                    {/* <Button color="primary" sx={{ mr: 2 }}>Log in</Button> */}
                     <Button color="primary" href="/form-generator" variant="contained" endIcon={<ArrowForwardIcon />}>
                         Get Started
                     </Button>
+                    </div>
+                    
                 </Toolbar>
             </AppBar>
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}  style={{ marginTop: '74px' }}>
-                <Box sx={{ textAlign: 'center', mb: 6 }}>
+            <Box sx={{ pt: 8, pb: 10, backgroundColor: '#fff', mt: 8 }}>
+                <Container maxWidth="md" sx={{ textAlign: 'center', py: 10 }}>
                     <Typography variant="h1" component="h1" gutterBottom>
-                        AI Form Generator
+                        Make <span style={{ color: '#ff4e50' }}>any form</span> in minutes
                     </Typography>
-                    <Typography variant="h5" component="p" gutterBottom>
-                        Seamlessly design and deploy sophisticated forms powered by AI.
+                    <Typography variant="h2" component="p" gutterBottom>
+                        Create powerful forms, surveys, and quizzes your audience will answer.
                     </Typography>
-                    <Link href="/form-generator" passHref legacyBehavior>
-                        <Button variant="contained" color="primary" size="large" sx={{ mt: 3 }} endIcon={<ArrowForwardIcon />}>
-                            Start Now
-                        </Button>
-                    </Link>
-                </Box>
-                <Box component="section" sx={{ mb: 6 }}>
-                    <Typography variant="h2" component="h2" gutterBottom>
-                        Key Features
-                    </Typography>
-                    <Grid container spacing={4}>
-                        <Grid item xs={12} md={4}>
-                            <Paper elevation={3} sx={{ p: 3, textAlign: 'center', borderRadius: '20px', transition: 'transform 0.3s', '&:hover': { transform: 'translateY(-10px)' } }}>
-                                <Typography variant="h3" component="h3">
-                                    Fully Customizable
-                                </Typography>
-                                <Typography variant="body1" component="p">
-                                    Tailor every aspect of your forms to match your brand and requirements.
-                                </Typography>
-                            </Paper>
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            <Paper elevation={3} sx={{ p: 3, textAlign: 'center', borderRadius: '20px', transition: 'transform 0.3s', '&:hover': { transform: 'translateY(-10px)' } }}>
-                                <Typography variant="h3" component="h3">
-                                    Real-Time Preview
-                                </Typography>
-                                <Typography variant="body1" component="p">
-                                    Instantly visualize changes to your forms as you build them.
-                                </Typography>
-                            </Paper>
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            <Paper elevation={3} sx={{ p: 3, textAlign: 'center', borderRadius: '20px', transition: 'transform 0.3s', '&:hover': { transform: 'translateY(-10px)' } }}>
-                                <Typography variant="h3" component="h3">
-                                    AI Integration
-                                </Typography>
-                                <Typography variant="body1" component="p">
-                                    Utilize AI to create intelligent and dynamic forms effortlessly.
-                                </Typography>
-                            </Paper>
-                        </Grid>
+                    <Button variant="outlined" color="primary" size="large" sx={{ mt: 3 }}>
+                        Get started - it's free
+                    </Button>
+                    <Box sx={{ mt: 5 }}>
+                        <img src="https://firebasestorage.googleapis.com/v0/b/cristomathewmemorial.appspot.com/o/Untitled%20design%20(1).png?alt=media&token=ea841876-2566-4af1-bb6e-6e4f4f195b76" alt="Form Example" width="100%" style={{ maxWidth: '800px', height: 'auto' }} />
+                    </Box>
+                </Container>
+            </Box>
+            <Container maxWidth="lg" sx={{ py: 10 }}>
+                <Typography variant="h2" component="h2" gutterBottom sx={{ textAlign: 'center', color: '#333333' }}>
+                    Build any form, without code
+                </Typography>
+                <Grid container spacing={4}>
+                    <Grid item xs={12} md={4}>
+                        <Paper elevation={3} sx={{ p: 3, textAlign: 'center', borderRadius: '20px', transition: 'transform 0.3s', '&:hover': { transform: 'translateY(-10px)' } }}>
+                            <Typography variant="h3" component="h3">
+                                Fully Customizable
+                            </Typography>
+                            <Typography variant="body1" component="p">
+                                Tailor every aspect of your forms to match your brand and requirements.
+                            </Typography>
+                        </Paper>
                     </Grid>
-                </Box>
-                <Box component="section" sx={{ textAlign: 'center', mb: 6 }}>
-                    <Typography variant="h2" component="h2" gutterBottom>
-                        Ready to Get Started?
-                    </Typography>
-                    <Link href="/form-generator" passHref legacyBehavior>
-                        <Button variant="contained" color="secondary" size="large" sx={{ mt: 3 }} endIcon={<ArrowForwardIcon />}>
-                            Create Your Form
-                        </Button>
-                    </Link>
-                </Box>
+                    <Grid item xs={12} md={4}>
+                        <Paper elevation={3} sx={{ p: 3, textAlign: 'center', borderRadius: '20px', transition: 'transform 0.3s', '&:hover': { transform: 'translateY(-10px)' } }}>
+                            <Typography variant="h3" component="h3">
+                                Real-Time Preview
+                            </Typography>
+                            <Typography variant="body1" component="p">
+                                Instantly visualize changes to your forms as you build them.
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <Paper elevation={3} sx={{ p: 3, textAlign: 'center', borderRadius: '20px', transition: 'transform 0.3s', '&:hover': { transform: 'translateY(-10px)' } }}>
+                            <Typography variant="h3" component="h3">
+                                AI Integration
+                            </Typography>
+                            <Typography variant="body1" component="p">
+                                Utilize AI to create intelligent and dynamic forms effortlessly.
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <Paper elevation={3} sx={{ p: 3, textAlign: 'center', borderRadius: '20px', transition: 'transform 0.3s', '&:hover': { transform: 'translateY(-10px)' } }}>
+                            <Typography variant="h3" component="h3">
+                                Templates Available
+                            </Typography>
+                            <Typography variant="body1" component="p">
+                                Choose from a variety of pre-designed templates to quickly create forms tailored to your needs.
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                </Grid>
             </Container>
-            <Box component="footer" sx={{ py: 3, textAlign: 'center', bgcolor: '#f7f8fc' }}>
+            <Box component="section" sx={{ textAlign: 'center', mb: 6 }}>
+                <Typography variant="h2" component="h2" gutterBottom>
+                    Ready to Get Started?
+                </Typography>
+                <Link href="/form-generator" passHref legacyBehavior>
+                    <Button variant="contained" color="secondary" size="large" sx={{ mt: 3 }} endIcon={<ArrowForwardIcon />}>
+                        Create Your Form
+                    </Button>
+                </Link>
+            </Box>
+            <Box sx={{ py: 3, textAlign: 'center', bgcolor: '#f7f8fc' }}>
                 <Typography variant="body1">
                     &copy; 2024 FormifyAI. All rights reserved.
                 </Typography>
