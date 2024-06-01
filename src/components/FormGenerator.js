@@ -6,10 +6,10 @@ import {
     AppBar, Toolbar, Typography, Container, TextField, Button, CircularProgress,
     Stepper, Step, StepLabel, Box, FormControlLabel, Radio, RadioGroup,
     FormLabel, FormControl, Grid, Paper, Snackbar, Alert, Divider, createTheme,
-    ThemeProvider, CssBaseline, InputLabel, Select, MenuItem
+    ThemeProvider, CssBaseline, InputLabel, Select, MenuItem, InputAdornment
 } from '@mui/material';
-import { teal, grey, purple } from '@mui/material/colors';
-import { render } from 'react-dom';
+import {  grey, purple } from '@mui/material/colors';
+import SearchIcon from '@mui/icons-material/Search';
 
 const theme = createTheme({
     palette: {
@@ -71,6 +71,7 @@ const FormGenerator = () => {
     const [formData, setFormData] = useState({});
     const [customFormType, setCustomFormType] = useState('');
     const [isCustom, setIsCustom] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const handleFormTypeChange = (e) => {
         const value = e.target.value;
@@ -145,7 +146,7 @@ const FormGenerator = () => {
                     setError(null);
                     setSuccess("Form generated successfully!");
                 } catch (jsonError) {
-                    setError('The generated JSON is malformed.');
+                    setError('The generated JSON is malformed. Please Try Again.');
                 }
             } else {
                 setError('Did not receive a valid response from OpenAI.');
@@ -302,7 +303,7 @@ const FormGenerator = () => {
                                 onChange={handleFormTypeChange}
                                 label="Form Type"
                             >
-                                <MenuItem value="custom">Add Custom</MenuItem>
+                                <MenuItem value="custom">Add New</MenuItem>
                                 {predefinedFormTypes.map((type) => (
                                     <MenuItem key={type} value={type}>
                                         {type}
@@ -389,37 +390,62 @@ const FormGenerator = () => {
 
     ];
 
+    const filteredTemplates = templates.filter(template =>
+        template.formType.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     const renderTemplates = () => {
         if (currentStep !== 0) {
             return null;
         }
         return (
             <Box mt={3} style={{ overflowY: 'scroll', maxHeight: '400px' }}>
-                <Typography variant="h5" gutterBottom style={{ position: 'sticky', top: 0, backgroundColor: 'white', padding: "10px", zIndex: 1 }}>
+                <Typography variant="h5"  style={{ position: 'sticky', top: 0, backgroundColor: 'white', padding: "10px", zIndex: 1 }}>
                     Need Help? Use a Template
                 </Typography>
-                <Divider style={{ marginBottom: '16px' }} />
+                {/* <Divider style={{ marginBottom: '16px' }} /> */}
+                <TextField
+                style={{ position: 'sticky', top: 50, backgroundColor: 'white', zIndex: 1 , color: 'white'}}
+                    label="Try Product Review Template.."
+                    variant="filled"
+                    fullWidth
+                    margin="normal"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <SearchIcon />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
                 <Grid container spacing={2}>
-                {templates.map((template, index) => (
-    <Grid item xs={12} sm={6} md={4} key={index}>
-        <Paper elevation={2} style={{ padding: '16px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <div>
-                <Typography variant="h6">{template.formType} Template</Typography>
-                <Typography variant="body2"><strong>Number of Fields:</strong> {template.numFields}</Typography>
-                <Typography variant="body2"><strong>Description:</strong> {template.formDescription}</Typography>
-            </div>
-            <Button 
-                variant="contained" 
-                color="primary" 
-                style={{ marginTop: '16px' }} 
-                onClick={() => handleGenerateForm(template)}
-            >
-                Use Template
-            </Button>
-        </Paper>
-    </Grid>
-))}
-
+                    {filteredTemplates.length > 0 ? (
+                        filteredTemplates.map((template, index) => (
+                            <Grid item xs={12} sm={6} md={4} key={index}>
+                                <Paper elevation={2} style={{ padding: '10px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                    <div>
+                                        <Typography variant="h6">{template.formType} Template</Typography>
+                                        <Typography variant="body2"><strong>Number of Fields:</strong> {template.numFields}</Typography>
+                                        <Typography variant="body2"><strong>Description:</strong> {template.formDescription}</Typography>
+                                    </div>
+                                    <Button 
+                                        variant="contained" 
+                                        color="primary" 
+                                        style={{ marginTop: '16px' }} 
+                                        onClick={() => handleGenerateForm(template)}
+                                    >
+                                        Use Template
+                                    </Button>
+                                </Paper>
+                            </Grid>
+                        ))
+                    ) : (
+                        <Typography variant="body1" color="textSecondary" style={{ margin: '16px', textAlign: "center", width: "100%" }}>
+                            Hmm... looks like your ask is a bit more unique, try adding manually.
+                        </Typography>
+                    )}
                 </Grid>
             </Box>
         );
