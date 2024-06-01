@@ -8,8 +8,11 @@ import {
     FormLabel, FormControl, Grid, Paper, Snackbar, Alert, Divider, createTheme,
     ThemeProvider, CssBaseline, InputLabel, Select, MenuItem, InputAdornment
 } from '@mui/material';
-import {  grey, purple } from '@mui/material/colors';
+import { deepPurple, grey, indigo, purple } from '@mui/material/colors';
 import SearchIcon from '@mui/icons-material/Search';
+import EditIcon from '@mui/icons-material/Edit';
+import UseTemplateIcon from '@mui/icons-material/LibraryAdd'; 
+
 
 const theme = createTheme({
     palette: {
@@ -17,7 +20,7 @@ const theme = createTheme({
             main: purple[500],
         },
         secondary: {
-            main: grey[500],
+            main: deepPurple[500],
         },
         background: {
             default: grey[100],
@@ -162,10 +165,25 @@ const FormGenerator = () => {
     const getRandomLoadingText = () => {
         const loadingTexts = [
             'Building your form...',
-            'Creating form fields...',
             'Almost there...',
             'Just a moment...',
             'Hang tight, preparing your form...',
+            'Formifying your form...',
+            'Formifying AI at work...',
+            'Formifying your thoughts...',
+            'Formifying your ideas...',
+            'Formifying your imagination...',
+            'Formifying your creativity...',
+            'Formifying your vision...',
+            'Formifying your dreams...',
+            'Formifying your aspirations...',
+            'Formifying your goals...',
+            'Formifying your desires...',
+            'Formifying your wishes...',
+            'Formifying your requests...',
+            'Formifying your requirements...',
+            'Formifying your needs...',
+            'Formifying your expectations...',
         ];
         return loadingTexts[Math.floor(Math.random() * loadingTexts.length)];
     };
@@ -284,7 +302,7 @@ const FormGenerator = () => {
                         }
                     })}
                 </Grid>
-                <Button type="button" variant="contained" color="primary" onClick={exportToCSV} style={{ marginTop: '16px'}}>
+                <Button type="button" variant="contained" color="primary" onClick={exportToCSV} style={{ marginTop: '16px' }}>
                     Export to CSV
                 </Button>
             </form>
@@ -296,7 +314,7 @@ const FormGenerator = () => {
             case 0:
                 return (
                     <Box>
-                         <FormControl fullWidth margin="normal" variant="outlined">
+                        <FormControl fullWidth margin="normal" variant="outlined">
                             <InputLabel>Form Type</InputLabel>
                             <Select
                                 value={isCustom ? 'custom' : formType}
@@ -321,7 +339,7 @@ const FormGenerator = () => {
                                 margin="normal"
                                 variant="outlined"
                             />
-                        )} 
+                        )}
                     </Box>
                 );
             case 1:
@@ -387,12 +405,19 @@ const FormGenerator = () => {
         { formType: 'Appointment Booking', numFields: 6, formDescription: 'Appointment booking form for scheduling meetings' },
         { formType: 'User Profile', numFields: 7, formDescription: 'User profile form for updating personal information' },
         { formType: 'Contest Entry', numFields: 5, formDescription: 'Contest entry form for participating in a competition' }
-
     ];
 
     const filteredTemplates = templates.filter(template =>
         template.formType.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    const handleEditTemplate = (template) => {
+        setFormType(template.formType);
+        setNumFields(template.numFields);
+        setFormDescription(template.formDescription);
+        setIsCustom(false);
+        setCurrentStep(0);
+    };
 
     const renderTemplates = () => {
         if (currentStep !== 0) {
@@ -400,13 +425,12 @@ const FormGenerator = () => {
         }
         return (
             <Box mt={3} style={{ overflowY: 'scroll', maxHeight: '400px' }}>
-                <Typography variant="h5"  style={{ position: 'sticky', top: 0, backgroundColor: 'white', padding: "10px", zIndex: 1 }}>
+                <Typography variant="h5" style={{ position: 'sticky', top: 0, backgroundColor: 'white', padding: "10px", zIndex: 1 }}>
                     Need Help? Use a Template
                 </Typography>
-                {/* <Divider style={{ marginBottom: '16px' }} /> */}
                 <TextField
-                style={{ position: 'sticky', top: 50, backgroundColor: 'white', zIndex: 1 , color: 'white'}}
-                    label="Try Product Review Template.."
+                    style={{ position: 'sticky', top: 50, backgroundColor: 'white', zIndex: 1 }}
+                    label="Search Templates"
                     variant="filled"
                     fullWidth
                     margin="normal"
@@ -430,14 +454,24 @@ const FormGenerator = () => {
                                         <Typography variant="body2"><strong>Number of Fields:</strong> {template.numFields}</Typography>
                                         <Typography variant="body2"><strong>Description:</strong> {template.formDescription}</Typography>
                                     </div>
-                                    <Button 
-                                        variant="contained" 
-                                        color="primary" 
-                                        style={{ marginTop: '16px' }} 
-                                        onClick={() => handleGenerateForm(template)}
-                                    >
-                                        Use Template
-                                    </Button>
+                                    <Box display="flex" flexDirection="column" height="80px" justifyContent="space-between" mt={2}>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            startIcon={<UseTemplateIcon />}
+                                            onClick={() => handleGenerateForm(template)}
+                                        >
+                                            Use
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            color="secondary"
+                                            startIcon={<EditIcon />}
+                                            onClick={() => handleEditTemplate(template)}
+                                        >
+                                            Edit
+                                        </Button>
+                                    </Box>
                                 </Paper>
                             </Grid>
                         ))
@@ -460,7 +494,7 @@ const FormGenerator = () => {
                         <Typography variant="h6">Formify AI</Typography>
                     </Toolbar>
                 </AppBar>
-                <Container maxWidth="lg" style={{ flex: 1, display: 'flex', marginTop: '80px' }}>
+                <Container maxWidth="lg" style={{ display: 'flex', marginTop: '80px' }}>
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={6}>
                             <Paper elevation={3} style={{ padding: '24px' }}>
@@ -481,28 +515,22 @@ const FormGenerator = () => {
                                             Back
                                         </Button>
                                     )}
-                                    
                                     {currentStep < steps.length - 1 && (
-
                                         <Button onClick={handleNextStep} disabled={(currentStep === 0 && (isCustom && !customFormType)) || (!isCustom && !formType) || (currentStep === 2 && (!formDescription || formDescription.length < 15))} variant="contained" color="primary" style={{ marginLeft: '8px' }}>
                                             Next
                                         </Button>
-                                        
                                     )}
                                     {currentStep === steps.length - 1 && (
-                                        <Button onClick={() => handleGenerateForm()} variant="contained" color="primary" style={{ marginLeft: '8px' }}>
+                                        <Button onClick={()=> handleGenerateForm()} variant="contained" color="primary" style={{ marginLeft: '8px' }}>
                                             Generate Form
                                         </Button>
                                     )}
                                 </Box>
-                                
-                                
                             </Paper>
                             {renderTemplates()}
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            
-                                <Paper elevation={3} style={{ padding: '24px' }}>
+                            <Paper elevation={3} style={{ padding: '24px' }}>
                                 <Typography variant="h5" gutterBottom>Form Preview</Typography>
                                 <Divider style={{ marginBottom: '16px' }} />
                                 {loading && (
@@ -529,18 +557,14 @@ const FormGenerator = () => {
                                     renderForm()
                                 ) : (
                                     <>
-                                    {
-                                        !loading && (
+                                        {!loading && (
                                             <Typography variant="body1" color="textSecondary">
                                                 Your form preview will appear here once generated.
                                             </Typography>
-                                        )
-                                    }
+                                        )}
                                     </>
                                 )}
                             </Paper>
-                        
-                            
                         </Grid>
                     </Grid>
                 </Container>
