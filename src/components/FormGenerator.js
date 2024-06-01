@@ -490,7 +490,7 @@ const FormGenerator = () => {
                                         
                                     )}
                                     {currentStep === steps.length - 1 && (
-                                        <Button onClick={handleGenerateForm} variant="contained" color="primary" style={{ marginLeft: '8px' }}>
+                                        <Button onClick={() => handleGenerateForm()} variant="contained" color="primary" style={{ marginLeft: '8px' }}>
                                             Generate Form
                                         </Button>
                                     )}
