@@ -122,7 +122,7 @@ const LandingPage = () => {
                         Get started - it's free
                     </Button>
                     <Box sx={{ mt: 5 }}>
-                        <img src="https://firebasestorage.googleapis.com/v0/b/cristomathewmemorial.appspot.com/o/Untitled%20design%20(1).png?alt=media&token=ea841876-2566-4af1-bb6e-6e4f4f195b76" alt="Form Example" width="100%" style={{ maxWidth: '800px', height: 'auto' }} />
+                        <img src="https://img.freepik.com/free-vector/flat-woman-chatting-with-chatbot-communicating-ai-robot-assistant_88138-959.jpg?t=st=1717252826~exp=1717256426~hmac=3ab4d15c06a6b4233962aa478d75c4e3ccafb968a3ca881f028cd380c059a643&w=826" alt="Form Example" width="100%" style={{ maxWidth: '800px', height: 'auto' }} />
                     </Box>
                 </Container>
             </Box>
