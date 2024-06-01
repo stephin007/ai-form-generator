@@ -95,20 +95,18 @@ const LandingPage = () => {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <AppBar position="fixed" elevation={1} sx={{ bgcolor: 'background.paper' }} style={{display: "flex", justifyContent: "space-between"}}>
-                <Toolbar >
+            <AppBar position="fixed" elevation={1} sx={{ bgcolor: 'background.paper' }} >
+                <Toolbar style={{display: "flex", justifyContent: "space-between"}}>
                     <div style={{display: "flex", alignItems: "center"}}>
                     <img src="https://firebasestorage.googleapis.com/v0/b/cristomathewmemorial.appspot.com/o/1.png?alt=media&token=55b753f2-fc97-4768-b091-1d4020412920" alt="Logo" style={{ height: '60px' }} />
-                    <Typography variant="h6" component="div" sx={{ fontWeight: 700 }} color="secondary">
+                    <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 700 }} color="secondary">
                         FormifyAI
                     </Typography>
                     </div>
-                    <div>
                     {/* <Button color="primary" sx={{ mr: 2 }}>Log in</Button> */}
                     <Button color="primary" href="/form-generator" variant="contained" endIcon={<ArrowForwardIcon />}>
                         Get Started
                     </Button>
-                    </div>
                     
                 </Toolbar>
             </AppBar>
