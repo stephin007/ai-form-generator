@@ -1,5 +1,8 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Link from 'next/link';
+import {useRouter} from 'next/router';
+import { useAuth } from '../../AuthContext';
+import { signInWithGoogle } from '../../firebaseConfig';
 import {
     AppBar, Toolbar, Typography, Button, Container, Box, Grid, Paper, CssBaseline, IconButton
 } from '@mui/material';
@@ -92,6 +95,14 @@ const theme = createTheme({
 });
 
 const LandingPage = () => {
+    const {user} = useAuth()
+    const router = useRouter()
+    useEffect(() => {
+        if(user){
+            router.push('/form-generator')
+        }
+    }
+    , [user, router])
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -104,10 +115,9 @@ const LandingPage = () => {
                     </Typography>
                     </div>
                     {/* <Button color="primary" sx={{ mr: 2 }}>Log in</Button> */}
-                    <Button color="primary" href="/form-generator" variant="contained" endIcon={<ArrowForwardIcon />}>
-                        Get Started
+                    <Button variant="contained" color="primary" onClick={signInWithGoogle}>
+                        Login/Signup
                     </Button>
-                    
                 </Toolbar>
             </AppBar>
             <Box sx={{ pt: 8, pb: 10, backgroundColor: '#fff', mt: 8 }}>
@@ -118,7 +128,7 @@ const LandingPage = () => {
                     <Typography variant="h2" component="p" gutterBottom>
                         Create powerful forms, surveys, and quizzes your audience will answer.
                     </Typography>
-                    <Button variant="outlined" color="primary" size="large" sx={{ mt: 3 }}>
+                    <Button href="/form-generator" variant="outlined" color="primary" size="large" sx={{ mt: 3 }}>
                         Get started - it's free
                     </Button>
                     <Box sx={{ mt: 5 }}>
