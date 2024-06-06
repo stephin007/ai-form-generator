@@ -2,64 +2,13 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
-import {
-    AppBar, Toolbar, Typography, Container, TextField, Button, CircularProgress,
-    Stepper, Step, StepLabel, Box, FormControlLabel, Radio, RadioGroup,
-    FormLabel, FormControl, Grid, Paper, Snackbar, Alert, Divider, createTheme,
-    ThemeProvider, CssBaseline, InputLabel, Select, MenuItem, InputAdornment
-} from '@mui/material';
-import { deepPurple, grey, indigo, purple } from '@mui/material/colors';
-import SearchIcon from '@mui/icons-material/Search';
-import EditIcon from '@mui/icons-material/Edit';
-import UseTemplateIcon from '@mui/icons-material/LibraryAdd'; 
-
-
-const theme = createTheme({
-    palette: {
-        primary: {
-            main: purple[500],
-        },
-        secondary: {
-            main: deepPurple[500],
-        },
-        background: {
-            default: grey[100],
-        },
-    },
-    typography: {
-        h5: {
-            fontWeight: 600,
-        },
-        h6: {
-            fontWeight: 500,
-        },
-        body1: {
-            fontSize: '1rem',
-        },
-    },
-});
-
-const steps = ['Choose Form Type', 'Set Number of Fields', 'Describe Your Form', 'Review and Generate'];
-
-const predefinedFormTypes = [
-    'Registration',
-    'Feedback',
-    'Survey',
-    'Application',
-    'Contact Us',
-    'Order Form',
-    'Subscription',
-    'Login',
-    'Job Application',
-    'Event RSVP',
-    'Product Review',
-    'Support Ticket',
-    'Newsletter Signup',
-    'Poll',
-    'Appointment Booking',
-    'User Profile',
-    'Contest Entry',
-];
+import {Typography, Container, Box, Grid, Paper, ThemeProvider, CssBaseline } from '@mui/material';
+import Header from './Header';
+import FormStepper from './FormStepper';
+import FormContent from './FormContent';
+import FormPreview from './FormPreview';
+import TemplatesList from './TemplatesList';
+import theme from '../styles/themes';
 
 const FormGenerator = () => {
     const [currentStep, setCurrentStep] = useState(0);
@@ -74,7 +23,6 @@ const FormGenerator = () => {
     const [formData, setFormData] = useState({});
     const [customFormType, setCustomFormType] = useState('');
     const [isCustom, setIsCustom] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
 
     const handleFormTypeChange = (e) => {
         const value = e.target.value;
@@ -164,36 +112,18 @@ const FormGenerator = () => {
 
     const getRandomLoadingText = () => {
         const loadingTexts = [
-            'Building your form...',
-            'Almost there...',
-            'Just a moment...',
-            'Hang tight, preparing your form...',
-            'Formifying your form...',
-            'Formifying AI at work...',
-            'Formifying your thoughts...',
-            'Formifying your ideas...',
-            'Formifying your imagination...',
-            'Formifying your creativity...',
-            'Formifying your vision...',
-            'Formifying your dreams...',
-            'Formifying your aspirations...',
-            'Formifying your goals...',
-            'Formifying your desires...',
-            'Formifying your wishes...',
-            'Formifying your requests...',
-            'Formifying your requirements...',
-            'Formifying your needs...',
-            'Formifying your expectations...',
+            'Building your form...', 'Almost there...', 'Just a moment...', 'Hang tight, preparing your form...',
+            'Formifying your form...', 'Formifying AI at work...', 'Formifying your thoughts...', 'Formifying your ideas...',
+            'Formifying your imagination...', 'Formifying your creativity...', 'Formifying your vision...', 'Formifying your dreams...',
+            'Formifying your aspirations...', 'Formifying your goals...', 'Formifying your desires...', 'Formifying your wishes...',
+            'Formifying your requests...', 'Formifying your requirements...', 'Formifying your needs...', 'Formifying your expectations...'
         ];
         return loadingTexts[Math.floor(Math.random() * loadingTexts.length)];
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
+        setFormData({ ...formData, [name]: value });
     };
 
     const handleSubmit = (e) => {
@@ -226,167 +156,6 @@ const FormGenerator = () => {
         a.click();
     };
 
-    const renderForm = () => {
-        if (!formSchema || !formSchema.properties) {
-            return null;
-        }
-
-        return (
-            <form onSubmit={handleSubmit}>
-                <Grid container spacing={2}>
-                    {Object.keys(formSchema.properties).map((key, index) => {
-                        const field = formSchema.properties[key];
-                        const isRequired = formSchema.required.includes(key);
-
-                        switch (field.type) {
-                            case 'string':
-                                if (field.format === 'email') {
-                                    return (
-                                        <Grid item xs={12} key={index}>
-                                            <TextField
-                                                label={field.title}
-                                                type="email"
-                                                name={key}
-                                                required={isRequired}
-                                                minLength={field.minLength}
-                                                maxLength={field.maxLength}
-                                                onChange={handleChange}
-                                                fullWidth
-                                            />
-                                        </Grid>
-                                    );
-                                }
-                                return (
-                                    <Grid item xs={12} key={index}>
-                                        <TextField
-                                            label={field.title}
-                                            type="text"
-                                            name={key}
-                                            required={isRequired}
-                                            minLength={field.minLength}
-                                            maxLength={field.maxLength}
-                                            onChange={handleChange}
-                                            fullWidth
-                                        />
-                                    </Grid>
-                                );
-                            case 'number':
-                            case 'integer':
-                                return (
-                                    <Grid item xs={12} key={index}>
-                                        <TextField
-                                            label={field.title}
-                                            type="number"
-                                            name={key}
-                                            required={isRequired}
-                                            inputProps={{ min: field.minimum, max: field.maximum }}
-                                            onChange={handleChange}
-                                            fullWidth
-                                        />
-                                    </Grid>
-                                );
-                            case 'boolean':
-                                return (
-                                    <Grid item xs={12} key={index}>
-                                        <FormControl component="fieldset">
-                                            <FormLabel component="legend">{field.title}</FormLabel>
-                                            <RadioGroup row name={key} onChange={handleChange}>
-                                                <FormControlLabel value="true" control={<Radio />} label="Yes" />
-                                                <FormControlLabel value="false" control={<Radio />} label="No" />
-                                            </RadioGroup>
-                                        </FormControl>
-                                    </Grid>
-                                );
-                            default:
-                                return null;
-                        }
-                    })}
-                </Grid>
-                <Button type="button" variant="contained" color="primary" onClick={exportToCSV} style={{ marginTop: '16px' }}>
-                    Export to CSV
-                </Button>
-            </form>
-        );
-    };
-
-    const renderStepContent = (step) => {
-        switch (step) {
-            case 0:
-                return (
-                    <Box>
-                        <FormControl fullWidth margin="normal" variant="outlined">
-                            <InputLabel>Form Type</InputLabel>
-                            <Select
-                                value={isCustom ? 'custom' : formType}
-                                onChange={handleFormTypeChange}
-                                label="Form Type"
-                            >
-                                <MenuItem value="custom">Add New</MenuItem>
-                                {predefinedFormTypes.map((type) => (
-                                    <MenuItem key={type} value={type}>
-                                        {type}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        {isCustom && (
-                            <TextField
-                                label="Custom Form Type"
-                                value={customFormType}
-                                onChange={(e) => setCustomFormType(e.target.value)}
-                                placeholder="Enter the custom form type"
-                                fullWidth
-                                margin="normal"
-                                variant="outlined"
-                            />
-                        )}
-                    </Box>
-                );
-            case 1:
-                return (
-                    <Box>
-                        <TextField
-                            label="Number of Fields"
-                            type="number"
-                            value={numFields}
-                            onChange={(e) => setNumFields(e.target.value)}
-                            inputProps={{ min: 1, max: 20 }}
-                            fullWidth
-                            margin="normal"
-                            variant="outlined"
-                        />
-                    </Box>
-                );
-            case 2:
-                return (
-                    <Box>
-                        <TextField
-                            label="Form Description (At least 15 characters)"
-                            value={formDescription}
-                            onChange={(e) => setFormDescription(e.target.value)}
-                            placeholder="Enter a description of the form's purpose or the type of questions (e.g., Collecting user feedback on a new product)"
-                            fullWidth
-                            margin="normal"
-                            multiline
-                            rows={4}
-                            variant="outlined"
-                        />
-                    </Box>
-                );
-            case 3:
-                return (
-                    <Box>
-                        <Divider style={{ marginBottom: '16px' }} />
-                        <Typography><strong>Form Type:</strong> {formType || customFormType}</Typography>
-                        <Typography><strong>Number of Fields:</strong> {numFields}</Typography>
-                        <Typography><strong>Form Description:</strong> {formDescription}</Typography>
-                    </Box>
-                );
-            default:
-                return null;
-        }
-    };
-
     const templates = [
         { formType: 'Registration', numFields: 5, formDescription: 'User registration form for a new website' },
         { formType: 'Feedback', numFields: 4, formDescription: 'Feedback form to gather user opinions on a product' },
@@ -407,165 +176,67 @@ const FormGenerator = () => {
         { formType: 'Contest Entry', numFields: 5, formDescription: 'Contest entry form for participating in a competition' }
     ];
 
-    const filteredTemplates = templates.filter(template =>
-        template.formType.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    const handleEditTemplate = (template) => {
-        setFormType(template.formType);
-        setNumFields(template.numFields);
-        setFormDescription(template.formDescription);
-        setIsCustom(false);
-        setCurrentStep(0);
-    };
-
-    const renderTemplates = () => {
-        if (currentStep !== 0) {
-            return null;
-        }
-        return (
-            <Box mt={3} style={{ overflowY: 'scroll', maxHeight: '400px' }}>
-                <Typography variant="h5" style={{ position: 'sticky', top: 0, backgroundColor: 'white', padding: "10px", zIndex: 1 }}>
-                    Need Help? Use a Template
-                </Typography>
-                <TextField
-                    style={{ position: 'sticky', top: 50, backgroundColor: 'white', zIndex: 1 }}
-                    label="Search Templates"
-                    variant="filled"
-                    fullWidth
-                    margin="normal"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <SearchIcon />
-                            </InputAdornment>
-                        ),
-                    }}
-                />
-                <Grid container spacing={2}>
-                    {filteredTemplates.length > 0 ? (
-                        filteredTemplates.map((template, index) => (
-                            <Grid item xs={12} sm={6} md={4} key={index}>
-                                <Paper elevation={2} style={{ padding: '10px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                                    <div>
-                                        <Typography variant="h6">{template.formType} Template</Typography>
-                                        <Typography variant="body2"><strong>Number of Fields:</strong> {template.numFields}</Typography>
-                                        <Typography variant="body2"><strong>Description:</strong> {template.formDescription}</Typography>
-                                    </div>
-                                    <Box display="flex" flexDirection="column" height="80px" justifyContent="space-between" mt={2}>
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            startIcon={<UseTemplateIcon />}
-                                            onClick={() => handleGenerateForm(template)}
-                                        >
-                                            Use
-                                        </Button>
-                                        <Button
-                                            variant="outlined"
-                                            color="secondary"
-                                            startIcon={<EditIcon />}
-                                            onClick={() => handleEditTemplate(template)}
-                                        >
-                                            Edit
-                                        </Button>
-                                    </Box>
-                                </Paper>
-                            </Grid>
-                        ))
-                    ) : (
-                        <Typography variant="body1" color="textSecondary" style={{ margin: '16px', textAlign: "center", width: "100%" }}>
-                            Hmm... looks like your ask is a bit more unique, try adding manually.
-                        </Typography>
-                    )}
-                </Grid>
-            </Box>
-        );
-    };
-
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <Box display="flex" flexDirection="column" minHeight="100vh">
-                <AppBar position="fixed">
-                    <Toolbar>
-                        <img src="https://firebasestorage.googleapis.com/v0/b/cristomathewmemorial.appspot.com/o/2.png?alt=media&token=dc7379e4-488e-447e-9644-aef33cc8cccd" alt="Logo" style={{ height: '60px'}} />
-                        <Typography variant="h6">Formify AI</Typography>
-                    </Toolbar>
-                </AppBar>
+                <Header />
                 <Container maxWidth="lg" style={{ display: 'flex', marginTop: '80px' }}>
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={6}>
                             <Paper elevation={3} style={{ padding: '24px' }}>
                                 <Typography variant="h5" gutterBottom>Follow the Steps</Typography>
-                                <Stepper activeStep={currentStep} alternativeLabel>
-                                    {steps.map((label, index) => (
-                                        <Step key={index}>
-                                            <StepLabel>{label}</StepLabel>
-                                        </Step>
-                                    ))}
-                                </Stepper>
-                                <Box mt={3} mb={2}>
-                                    {renderStepContent(currentStep)}
-                                </Box>
-                                <Box>
-                                    {currentStep > 0 && (
-                                        <Button onClick={handlePreviousStep} variant="outlined" color="primary">
-                                            Back
-                                        </Button>
+                                <FormStepper
+                                    currentStep={currentStep}
+                                    handlePreviousStep={handlePreviousStep}
+                                    handleNextStep={handleNextStep}
+                                    renderStepContent={(step) => (
+                                        <FormContent
+                                            currentStep={step}
+                                            formType={formType}
+                                            isCustom={isCustom}
+                                            handleFormTypeChange={handleFormTypeChange}
+                                            customFormType={customFormType}
+                                            setCustomFormType={setCustomFormType}
+                                            numFields={numFields}
+                                            setNumFields={setNumFields}
+                                            formDescription={formDescription}
+                                            setFormDescription={setFormDescription}
+                                        />
                                     )}
-                                    {currentStep < steps.length - 1 && (
-                                        <Button onClick={handleNextStep} disabled={(currentStep === 0 && (isCustom && !customFormType)) || (!isCustom && !formType) || (currentStep === 2 && (!formDescription || formDescription.length < 15))} variant="contained" color="primary" style={{ marginLeft: '8px' }}>
-                                            Next
-                                        </Button>
-                                    )}
-                                    {currentStep === steps.length - 1 && (
-                                        <Button onClick={()=> handleGenerateForm()} variant="contained" color="primary" style={{ marginLeft: '8px' }}>
-                                            Generate Form
-                                        </Button>
-                                    )}
-                                </Box>
+                                    handleGenerateForm={handleGenerateForm}
+                                    isCustom={isCustom}
+                                    customFormType={customFormType}
+                                    formType={formType}
+                                    formDescription={formDescription}
+                                />
                             </Paper>
-                            {renderTemplates()}
+                            <TemplatesList
+                                currentStep={currentStep}
+                                templates={templates}
+                                handleGenerateForm={handleGenerateForm}
+                                handleEditTemplate={({ formType, numFields, formDescription }) => {
+                                    setFormType(formType);
+                                    setNumFields(numFields);
+                                    setFormDescription(formDescription);
+                                    setIsCustom(false);
+                                    setCurrentStep(0);
+                                }}
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <Paper elevation={3} style={{ padding: '24px' }}>
-                                <Typography variant="h5" gutterBottom>Form Preview</Typography>
-                                <Divider style={{ marginBottom: '16px' }} />
-                                {loading && (
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '16px' }}>
-                                        <CircularProgress />
-                                        <Typography variant="body1" style={{ marginLeft: '8px' }}>{loadingText}</Typography>
-                                    </div>
-                                )}
-                                {success && (
-                                    <Snackbar open autoHideDuration={6000} onClose={() => setSuccess(null)}>
-                                        <Alert onClose={() => setSuccess(null)} severity="success">
-                                            {success}
-                                        </Alert>
-                                    </Snackbar>
-                                )}
-                                {error && (
-                                    <Snackbar open autoHideDuration={6000} onClose={() => setError(null)}>
-                                        <Alert onClose={() => setError(null)} severity="error">
-                                            {error}
-                                        </Alert>
-                                    </Snackbar>
-                                )}
-                                {formSchema ? (
-                                    renderForm()
-                                ) : (
-                                    <>
-                                        {!loading && (
-                                            <Typography variant="body1" color="textSecondary">
-                                                Your form preview will appear here once generated.
-                                            </Typography>
-                                        )}
-                                    </>
-                                )}
-                            </Paper>
+                            <FormPreview
+                                loading={loading}
+                                loadingText={loadingText}
+                                success={success}
+                                error={error}
+                                setSuccess={setSuccess}
+                                setError={setError}
+                                formSchema={formSchema}
+                                handleChange={handleChange}
+                                handleSubmit={handleSubmit}
+                                exportToCSV={exportToCSV}
+                            />
                         </Grid>
                     </Grid>
                 </Container>
