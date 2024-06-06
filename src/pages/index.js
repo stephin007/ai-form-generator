@@ -128,7 +128,7 @@ const LandingPage = () => {
                     <Typography variant="h2" component="p" gutterBottom>
                         Create powerful forms, surveys, and quizzes your audience will answer.
                     </Typography>
-                    <Button href="/form-generator" variant="outlined" color="primary" size="large" sx={{ mt: 3 }}>
+                    <Button onClick={signInWithGoogle} variant="outlined" color="primary" size="large" sx={{ mt: 3 }}>
                         Get started - it's free
                     </Button>
                     <Box sx={{ mt: 5 }}>
@@ -188,7 +188,7 @@ const LandingPage = () => {
                     Ready to Get Started?
                 </Typography>
                 <Link href="/form-generator" passHref legacyBehavior>
-                    <Button variant="contained" color="secondary" size="large" sx={{ mt: 3 }} endIcon={<ArrowForwardIcon />}>
+                    <Button onClick={signInWithGoogle} variant="contained" color="secondary" size="large" sx={{ mt: 3 }} endIcon={<ArrowForwardIcon />}>
                         Create Your Form
                     </Button>
                 </Link>
