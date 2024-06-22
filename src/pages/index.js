@@ -13,6 +13,9 @@ import {
   Grid,
   Paper,
   CssBaseline,
+  CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -110,12 +113,28 @@ const theme = createTheme({
 const LandingPage = () => {
   const { user } = useAuth();
   const router = useRouter();
+  const [loading, setLoading] = React.useState(false);
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
 
   useEffect(() => {
     if (user) {
-      router.push("/form-generator");
+      setLoading(true);
+      setTimeout(() => {
+        router.push("/form-generator");
+      }, 2000);
     }
   }, [user, router]);
+
+  const handleLogin = async () => {
+    setLoading(true);
+    try {
+      await signInWithGoogle();
+      setOpenSnackbar(true);
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+    setLoading(false);
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -144,14 +163,20 @@ const LandingPage = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={signInWithGoogle}
+            onClick={handleLogin}
+            disabled={loading}
             sx={{
               fontSize: { xs: "0.875rem", md: "1rem" },
               padding: { xs: "8px 16px", md: "10px 20px" },
             }}
           >
-            <LockIcon style={{ marginRight: "5px" }} />
-            Login with Google
+            {loading ? (
+              <CircularProgress size={24} />
+            ) : (
+              <>
+                <LockIcon style={{ marginRight: "5px" }} /> Login with Google
+              </>
+            )}
           </Button>
         </Toolbar>
       </AppBar>
@@ -165,11 +190,12 @@ const LandingPage = () => {
             answer.
           </Typography>
           <Button
-            onClick={signInWithGoogle}
+            onClick={handleLogin}
             variant="outlined"
             color="primary"
             size="large"
             sx={{ mt: 3 }}
+            disabled={loading}
           >
             Get started - it's free
           </Button>
@@ -185,7 +211,30 @@ const LandingPage = () => {
             />
           </Box>
         </Container>
+        <Container
+          maxWidth="lg"
+          sx={{ py: 10, textAlign: "center" }}
+          style={{ backgroundColor: "darkorchid" }}
+        >
+          <Typography
+            variant="h2"
+            component="h2"
+            gutterBottom
+            style={{ color: "white" }}
+          >
+            See FormifyAI in Action
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+            <img
+              src="https://firebasestorage.googleapis.com/v0/b/formifyai.appspot.com/o/ScreenRecording2024-06-22at10.43.59AM-ezgif.com-video-to-gif-converter.gif?alt=media&token=0c91aba1-badf-4b52-a368-3a9b687e6379" // replace with your actual GIF URL
+              alt="FormifyAI Demo"
+              width="100%"
+              style={{ maxWidth: "600px", height: "auto" }}
+            />
+          </Box>
+        </Container>
       </Box>
+
       <Container maxWidth="lg" sx={{ py: 10, textAlign: "center" }}>
         <Typography
           variant="h2"
@@ -282,12 +331,13 @@ const LandingPage = () => {
         </Typography>
         <Link href="/form-generator" passHref legacyBehavior>
           <Button
-            onClick={signInWithGoogle}
+            onClick={handleLogin}
             variant="contained"
             color="secondary"
             size="large"
             sx={{ mt: 3 }}
             endIcon={<ArrowForwardIcon />}
+            disabled={loading}
           >
             Create Your Form
           </Button>
@@ -299,6 +349,19 @@ const LandingPage = () => {
         </Typography>
       </Box>
       <FloatingFeedbackButton />
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert
+          onClose={() => setOpenSnackbar(false)}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          Successfully logged in!
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 };
