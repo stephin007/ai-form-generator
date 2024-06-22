@@ -9,18 +9,25 @@ const FormGeneratorPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-      if (!loading && !user) {
-          router.push('/');
-      }
+    if (!loading && !user) {
+      router.push("/");
+    }
   }, [user, loading, router]);
 
   if (loading) {
-      return (
-          <Container style={{display: 'flex',alignItems: 'center',height: '100vh',justifyContent: 'center'}}>
-              <CircularProgress />
-              <span style={{marginLeft: "40px"}}>Setting up your profile...</span>
-          </Container>
-      );
+    return (
+      <Container
+        style={{
+          display: "flex",
+          alignItems: "center",
+          height: "100vh",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+        <span style={{ marginLeft: "40px" }}>Setting up your profile...</span>
+      </Container>
+    );
   }
 
   return user ? <FormGenerator /> : null;

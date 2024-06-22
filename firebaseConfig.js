@@ -68,28 +68,42 @@ const getUserApiCallCount = async (userId) => {
   }
 };
 
-const incrementApiCallCount = async (userId) => {
+const incrementApiCallCount = async (userId, userEmail) => {
   const userRef = doc(db, "users", userId);
   const userDoc = await getDoc(userRef);
 
   if (userDoc.exists()) {
-    const currentCount = userDoc.data().apiCallCount;
-    await updateDoc(userRef, { apiCallCount: currentCount + 1 });
-    return currentCount + 1;
+    const currentData = userDoc.data();
+    const currentCount = currentData.apiCallCount || 0;
+
+    // Update the apiCallCount
+    const updateData = { apiCallCount: currentCount + 1 };
+
+    if (!currentData.email) {
+      // Only set the email if it is not already set
+      updateData.email = userEmail;
+    }
+
+    await updateDoc(userRef, updateData);
+    return {
+      apiCallCount: currentCount + 1,
+      email: currentData.email || userEmail,
+    };
   } else {
-    await setDoc(userRef, { apiCallCount: 1 });
-    return 1;
+    // Create the user document with apiCallCount and email
+    await setDoc(userRef, {
+      apiCallCount: 1,
+      email: userEmail,
+    });
+    return { apiCallCount: 1, email: userEmail };
   }
 };
 
-const saveFeedback = async (userId, feedback, userDetails) => {
+const saveFeedback = async (feedback) => {
   try {
     const feedbackRef = collection(db, "feedback");
     await addDoc(feedbackRef, {
-      userId: userId,
       feedback: feedback,
-      userDetails: userDetails,
-      timestamp: new Date(),
     });
   } catch (error) {
     console.error("Error saving feedback: ", error);

@@ -26,6 +26,7 @@ import {
   incrementApiCallCount,
   saveFeedback,
 } from "../../firebaseConfig";
+import FloatingFeedbackButton from "./FloatingFeedbackButton";
 
 const FormGenerator = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -35,15 +36,23 @@ const FormGenerator = () => {
   const [formSchema, setFormSchema] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
   const [loadingText, setLoadingText] = useState("");
   const [formData, setFormData] = useState({});
   const [customFormType, setCustomFormType] = useState("");
   const [isCustom, setIsCustom] = useState(false);
-  const [apiCallCount, setApiCallCount] = useState(0);
-  const [openModal, setOpenModal] = useState(false);
-  const [feedback, setFeedback] = useState("");
-  const { user } = useAuth();
+  const {
+    user,
+    feedback,
+    setFeedback,
+    success,
+    setSuccess,
+    apiCallCount,
+    setApiCallCount,
+    openModal,
+    setOpenModal,
+    handleModalClose,
+    handleFeedback,
+  } = useAuth();
 
   useEffect(() => {
     const fetchApiCallCount = async () => {
@@ -147,8 +156,8 @@ const FormGenerator = () => {
           setFormSchema(formSchema);
           setError(null);
           setSuccess("Form generated successfully!");
-          const newCount = await incrementApiCallCount(user.uid);
-          setApiCallCount(newCount);
+          const newCount = await incrementApiCallCount(user.uid, user.email);
+          setApiCallCount(newCount.apiCallCount);
         } catch (jsonError) {
           setError("The generated JSON is malformed. Please Try Again.");
         }
@@ -232,20 +241,6 @@ const FormGenerator = () => {
     a.href = url;
     a.download = "form-data.csv";
     a.click();
-  };
-
-  const handleModalClose = async () => {
-    if (user && feedback) {
-      const userDetails = {
-        email: user.email,
-        displayName: user.displayName,
-        uid: user.uid,
-      };
-      await saveFeedback(user.uid, feedback, userDetails);
-    }
-    setFeedback("");
-    setOpenModal(false);
-    setSuccess("Feedback submitted successfully!");
   };
 
   const templates = [
@@ -446,7 +441,7 @@ const FormGenerator = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={handleModalClose}
+              onClick={handleFeedback}
               style={{ marginTop: "16px" }}
             >
               Submit Feedback
