@@ -157,7 +157,7 @@ const FormGenerator = () => {
           const newCount = await incrementApiCallCount(user.uid, user.email);
           setApiCallCount(newCount.apiCallCount);
         } catch (jsonError) {
-          setError("The generated JSON is malformed. Please Try Again.");
+          setError("The generated form has some issues. Please Try Again.");
         }
       } else {
         setError("Did not receive a valid response from OpenAI.");

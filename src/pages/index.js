@@ -31,6 +31,10 @@ const theme = createTheme({
       default: "#f7f8fc",
       paper: "#ffffff",
     },
+    text: {
+      primary: "#333333",
+      secondary: "#666666",
+    },
   },
   typography: {
     h1: {
@@ -106,18 +110,20 @@ const theme = createTheme({
 const LandingPage = () => {
   const { user } = useAuth();
   const router = useRouter();
+
   useEffect(() => {
     if (user) {
       router.push("/form-generator");
     }
   }, [user, router]);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AppBar
         position="fixed"
-        elevation={1}
-        sx={{ bgcolor: "background.paper" }}
+        elevation={0}
+        sx={{ bgcolor: "background.paper", borderBottom: "1px solid #e0e0e0" }}
       >
         <Toolbar style={{ display: "flex", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center" }}>
@@ -135,18 +141,21 @@ const LandingPage = () => {
               FormifyAI
             </Typography>
           </div>
-          {/* <Button color="primary" sx={{ mr: 2 }}>Log in</Button> */}
           <Button
             variant="contained"
             color="primary"
             onClick={signInWithGoogle}
+            sx={{
+              fontSize: { xs: "0.875rem", md: "1rem" },
+              padding: { xs: "8px 16px", md: "10px 20px" },
+            }}
           >
             <LockIcon style={{ marginRight: "5px" }} />
             Login with Google
           </Button>
         </Toolbar>
       </AppBar>
-      <Box sx={{ pt: 8, pb: 10, backgroundColor: "#fff", mt: 8 }}>
+      <Box sx={{ pt: 12, pb: 10, backgroundColor: "#fff" }}>
         <Container maxWidth="md" sx={{ textAlign: "center", py: 10 }}>
           <Typography variant="h1" component="h1" gutterBottom>
             Make <span style={{ color: "#ff4e50" }}>any form</span> in minutes
@@ -169,17 +178,20 @@ const LandingPage = () => {
               src="https://img.freepik.com/free-vector/flat-woman-chatting-with-chatbot-communicating-ai-robot-assistant_88138-959.jpg?t=st=1717252826~exp=1717256426~hmac=3ab4d15c06a6b4233962aa478d75c4e3ccafb968a3ca881f028cd380c059a643&w=826"
               alt="Form Example"
               width="100%"
-              style={{ maxWidth: "800px", height: "auto" }}
+              style={{
+                maxWidth: "800px",
+                height: "auto",
+              }}
             />
           </Box>
         </Container>
       </Box>
-      <Container maxWidth="lg" sx={{ py: 10 }}>
+      <Container maxWidth="lg" sx={{ py: 10, textAlign: "center" }}>
         <Typography
           variant="h2"
           component="h2"
           gutterBottom
-          sx={{ textAlign: "center", color: "#333333" }}
+          sx={{ color: "#333333" }}
         >
           Build any form, without code
         </Typography>
