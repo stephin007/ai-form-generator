@@ -11,11 +11,8 @@ import { useAuth } from "../../AuthContext";
 import LoginButton from "./LoginButton";
 import ProfileMenu from "./ProfileMenu";
 
-import { getUserApiCallCount } from "../../firebaseConfig";
-import { useState, useEffect } from "react";
-
-const Header = ({ apiCallCount }) => {
-  const { user } = useAuth();
+const Header = () => {
+  const { user, apiCallCount } = useAuth();
 
   return (
     <AppBar position="fixed">

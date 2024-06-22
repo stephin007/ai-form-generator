@@ -24,9 +24,7 @@ import { useAuth } from "../../AuthContext";
 import {
   getUserApiCallCount,
   incrementApiCallCount,
-  saveFeedback,
 } from "../../firebaseConfig";
-import FloatingFeedbackButton from "./FloatingFeedbackButton";
 
 const FormGenerator = () => {
   const [currentStep, setCurrentStep] = useState(0);

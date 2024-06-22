@@ -17,6 +17,7 @@ import {
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import FloatingFeedbackButton from "@/components/FloatingFeedbackButton";
+import LockIcon from "@mui/icons-material/Lock";
 
 const theme = createTheme({
   palette: {
@@ -140,7 +141,8 @@ const LandingPage = () => {
             color="primary"
             onClick={signInWithGoogle}
           >
-            Login/Signup
+            <LockIcon style={{ marginRight: "5px" }} />
+            Login with Google
           </Button>
         </Toolbar>
       </AppBar>
