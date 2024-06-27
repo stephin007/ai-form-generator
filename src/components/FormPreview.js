@@ -15,8 +15,8 @@ import {
   FormControlLabel,
   Radio,
 } from "@mui/material";
-
 import { useAuth } from "../../AuthContext";
+import { saveToProfile } from "../../firebaseConfig";
 
 const FormPreview = ({
   loading,
@@ -28,7 +28,64 @@ const FormPreview = ({
   handleSubmit,
   exportToCSV,
 }) => {
-  const { success, setSuccess } = useAuth();
+  const { user, success, setSuccess } = useAuth();
+
+  const handleSaveToProfile = async () => {
+    if (user) {
+      try {
+        await saveToProfile(formSchema, user.email);
+        setSuccess("Form saved to profile successfully!");
+      } catch (error) {
+        setError("Error saving form to profile: " + error.message);
+      }
+    } else {
+      setError("You must be logged in to save the form to your profile.");
+    }
+  };
+
+  const renderFormField = (field, key, isRequired) => {
+    switch (field.type) {
+      case "string":
+        return (
+          <TextField
+            label={field.title}
+            type={field.format === "email" ? "email" : "text"}
+            name={key}
+            required={isRequired}
+            minLength={field.minLength}
+            maxLength={field.maxLength}
+            onChange={handleChange}
+            fullWidth
+          />
+        );
+      case "number":
+      case "integer":
+        return (
+          <TextField
+            label={field.title}
+            type="number"
+            name={key}
+            required={isRequired}
+            inputProps={{ min: field.minimum, max: field.maximum }}
+            onChange={handleChange}
+            fullWidth
+          />
+        );
+      case "boolean":
+        return (
+          <FormControl component="fieldset">
+            <FormLabel component="legend">{field.title}</FormLabel>
+            <RadioGroup row name={key} onChange={handleChange}>
+              <FormControlLabel value="true" control={<Radio />} label="Yes" />
+              <FormControlLabel value="false" control={<Radio />} label="No" />
+            </RadioGroup>
+          </FormControl>
+        );
+      default:
+        return null;
+    }
+  };
+
   const renderForm = () => {
     if (!formSchema || !formSchema.properties) {
       return null;
@@ -40,88 +97,35 @@ const FormPreview = ({
           {Object.keys(formSchema.properties).map((key, index) => {
             const field = formSchema.properties[key];
             const isRequired = formSchema.required.includes(key);
-
-            switch (field.type) {
-              case "string":
-                if (field.format === "email") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label={field.title}
-                        type="email"
-                        name={key}
-                        required={isRequired}
-                        minLength={field.minLength}
-                        maxLength={field.maxLength}
-                        onChange={handleChange}
-                        fullWidth
-                      />
-                    </Grid>
-                  );
-                }
-                return (
-                  <Grid item xs={12} key={index}>
-                    <TextField
-                      label={field.title}
-                      type="text"
-                      name={key}
-                      required={isRequired}
-                      minLength={field.minLength}
-                      maxLength={field.maxLength}
-                      onChange={handleChange}
-                      fullWidth
-                    />
-                  </Grid>
-                );
-              case "number":
-              case "integer":
-                return (
-                  <Grid item xs={12} key={index}>
-                    <TextField
-                      label={field.title}
-                      type="number"
-                      name={key}
-                      required={isRequired}
-                      inputProps={{ min: field.minimum, max: field.maximum }}
-                      onChange={handleChange}
-                      fullWidth
-                    />
-                  </Grid>
-                );
-              case "boolean":
-                return (
-                  <Grid item xs={12} key={index}>
-                    <FormControl component="fieldset">
-                      <FormLabel component="legend">{field.title}</FormLabel>
-                      <RadioGroup row name={key} onChange={handleChange}>
-                        <FormControlLabel
-                          value="true"
-                          control={<Radio />}
-                          label="Yes"
-                        />
-                        <FormControlLabel
-                          value="false"
-                          control={<Radio />}
-                          label="No"
-                        />
-                      </RadioGroup>
-                    </FormControl>
-                  </Grid>
-                );
-              default:
-                return null;
-            }
+            return (
+              <Grid item xs={12} key={index}>
+                {renderFormField(field, key, isRequired)}
+              </Grid>
+            );
           })}
         </Grid>
-        <Button
-          type="button"
-          variant="contained"
-          color="primary"
-          onClick={exportToCSV}
-          style={{ marginTop: "16px" }}
-        >
-          Export to CSV
-        </Button>
+        <Grid container spacing={2} style={{ marginTop: "16px" }}>
+          <Grid item>
+            <Button
+              type="button"
+              variant="contained"
+              color="primary"
+              onClick={exportToCSV}
+            >
+              Export to CSV
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              type="button"
+              variant="contained"
+              color="secondary"
+              onClick={handleSaveToProfile}
+            >
+              Save to Profile
+            </Button>
+          </Grid>
+        </Grid>
       </form>
     );
   };
@@ -161,17 +165,13 @@ const FormPreview = ({
           </Alert>
         </Snackbar>
       )}
-      {formSchema ? (
-        renderForm()
-      ) : (
-        <>
-          {!loading && (
+      {formSchema
+        ? renderForm()
+        : !loading && (
             <Typography variant="body1" color="textSecondary">
               Your form preview will appear here once generated.
             </Typography>
           )}
-        </>
-      )}
     </Paper>
   );
 };

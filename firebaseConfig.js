@@ -110,6 +110,19 @@ const saveFeedback = async (feedback) => {
   }
 };
 
+const saveToProfile = async (formSchema, userEmail) => {
+  try {
+    const formsRef = collection(db, "forms");
+    await addDoc(formsRef, {
+      userEmail: userEmail,
+      formSchema: formSchema,
+      createdAt: new Date(),
+    });
+  } catch (err) {
+    console.error("Error saving form: ", err);
+  }
+};
+
 export {
   auth,
   signInWithGoogle,
@@ -117,4 +130,5 @@ export {
   getUserApiCallCount,
   incrementApiCallCount,
   saveFeedback,
+  saveToProfile,
 };
