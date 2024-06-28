@@ -179,7 +179,7 @@ const FormGenerator = () => {
       "Just a moment...",
       "Hang tight, preparing your form...",
       "Formifying your form...",
-      "Formifying AI at work...",
+      "Formify AI at work...",
       "Formifying your thoughts...",
       "Formifying your ideas...",
       "Formifying your imagination...",
@@ -237,7 +237,7 @@ const FormGenerator = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "form-data.csv";
+    a.download = `${formSchema.title || "UntitledForm"}.csv`;
     a.click();
   };
 

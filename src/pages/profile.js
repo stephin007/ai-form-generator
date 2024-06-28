@@ -240,55 +240,106 @@ const ProfilePage = () => {
           </Typography>
         </Box>
         <Box mt={3}>
+          <Button variant="contained" color="secondary" onClick={handleLogout}>
+            Logout
+          </Button>
+        </Box>
+        <Box mt={3}>
           <Typography variant="h5">Saved Forms</Typography>
           {forms.length > 0 ? (
-            <Masonry columns={3} spacing={2} style={{ marginTop: "20px" }}>
-              {forms.map((form) => (
-                <Card
-                  key={form.id}
-                  style={{
-                    breakInside: "avoid",
-                    borderRadius: "8px",
-                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                  }}
-                >
-                  <CardHeader
-                    title={form.formSchema.title || "Untitled Form"}
-                    subheader={`Created At: ${new Date(
-                      form.createdAt.seconds * 1000
-                    ).toLocaleString()}`}
-                    titleTypographyProps={{ variant: "h6" }}
-                  />
-                  <CardContent>{renderForm(form.formSchema)}</CardContent>
-                  <CardActions>
-                    <Button
-                      size="small"
-                      color="secondary"
-                      onClick={() => handleExportToCSV(form)}
+            <>
+              <Box
+                sx={{
+                  display: { xs: "block", sm: "none" },
+                }}
+              >
+                <Grid container spacing={2} style={{ marginTop: "20px" }}>
+                  {forms.map((form) => (
+                    <Grid item xs={12} key={form.id}>
+                      <Card
+                        style={{
+                          borderRadius: "8px",
+                          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                        }}
+                      >
+                        <CardHeader
+                          title={form.formSchema.title || "Untitled Form"}
+                          subheader={`Created At: ${new Date(
+                            form.createdAt.seconds * 1000
+                          ).toLocaleString()}`}
+                          titleTypographyProps={{ variant: "h6" }}
+                        />
+                        <CardContent>{renderForm(form.formSchema)}</CardContent>
+                        <CardActions>
+                          <Button
+                            size="small"
+                            color="secondary"
+                            onClick={() => handleExportToCSV(form)}
+                          >
+                            Export to CSV
+                          </Button>
+                          <Button
+                            size="small"
+                            color="error"
+                            onClick={() => handleDeleteForm(form.id)}
+                          >
+                            Delete
+                          </Button>
+                        </CardActions>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+              <Box
+                sx={{
+                  display: { xs: "none", sm: "block" },
+                }}
+              >
+                <Masonry columns={3} spacing={2} style={{ marginTop: "20px" }}>
+                  {forms.map((form) => (
+                    <Card
+                      key={form.id}
+                      style={{
+                        breakInside: "avoid",
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                      }}
                     >
-                      Export to CSV
-                    </Button>
-                    <Button
-                      size="small"
-                      color="error"
-                      onClick={() => handleDeleteForm(form.id)}
-                    >
-                      Delete
-                    </Button>
-                  </CardActions>
-                </Card>
-              ))}
-            </Masonry>
+                      <CardHeader
+                        title={form.formSchema.title || "Untitled Form"}
+                        subheader={`Created At: ${new Date(
+                          form.createdAt.seconds * 1000
+                        ).toLocaleString()}`}
+                        titleTypographyProps={{ variant: "h6" }}
+                      />
+                      <CardContent>{renderForm(form.formSchema)}</CardContent>
+                      <CardActions>
+                        <Button
+                          size="small"
+                          color="secondary"
+                          onClick={() => handleExportToCSV(form)}
+                        >
+                          Export to CSV
+                        </Button>
+                        <Button
+                          size="small"
+                          color="error"
+                          onClick={() => handleDeleteForm(form.id)}
+                        >
+                          Delete
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  ))}
+                </Masonry>
+              </Box>
+            </>
           ) : (
             <Typography variant="body1" style={{ color: "gray" }}>
               No forms saved yet.
             </Typography>
           )}
-        </Box>
-        <Box mt={3}>
-          <Button variant="contained" color="secondary" onClick={handleLogout}>
-            Logout
-          </Button>
         </Box>
         {success && (
           <Snackbar
