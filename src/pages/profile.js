@@ -19,15 +19,17 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import Masonry from "@mui/lab/Masonry";
 import { useRouter } from "next/router";
-import { logout, fetchForms } from "../../firebaseConfig";
+import { logout, fetchForms, deleteForm } from "../../firebaseConfig";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const ProfilePage = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, success, setSuccess, error, setError } = useAuth();
   const router = useRouter();
 
   const [forms, setForms] = useState([]);
@@ -49,7 +51,7 @@ const ProfilePage = () => {
       };
       fetchUserForms();
     }
-  }, [user]);
+  }, [user, fetchForms]);
 
   const handleLogout = async () => {
     await logout();
@@ -176,6 +178,16 @@ const ProfilePage = () => {
     downloadCSV(csvString, form.formSchema.title || "UntitledForm");
   };
 
+  const handleDeleteForm = async (formId) => {
+    try {
+      await deleteForm(user.uid, formId);
+      fetchForms(user.uid).then((userForms) => setForms(userForms));
+      setSuccess("Form deleted successfully.");
+    } catch (error) {
+      setError(error.message + "!" + "Please try again.");
+    }
+  };
+
   if (loading || loadingForms) {
     return (
       <Container
@@ -256,7 +268,11 @@ const ProfilePage = () => {
                     >
                       Export to CSV
                     </Button>
-                    <Button size="small" color="error">
+                    <Button
+                      size="small"
+                      color="error"
+                      onClick={() => handleDeleteForm(form.id)}
+                    >
                       Delete
                     </Button>
                   </CardActions>
@@ -264,7 +280,9 @@ const ProfilePage = () => {
               ))}
             </Masonry>
           ) : (
-            <Typography variant="body1">No forms saved yet.</Typography>
+            <Typography variant="body1" style={{ color: "gray" }}>
+              No forms saved yet.
+            </Typography>
           )}
         </Box>
         <Box mt={3}>
@@ -272,6 +290,24 @@ const ProfilePage = () => {
             Logout
           </Button>
         </Box>
+        {success && (
+          <Snackbar
+            open
+            autoHideDuration={6000}
+            onClose={() => setSuccess(null)}
+          >
+            <Alert onClose={() => setSuccess(null)} severity="success">
+              {success}
+            </Alert>
+          </Snackbar>
+        )}
+        {error && (
+          <Snackbar open autoHideDuration={6000} onClose={() => setError(null)}>
+            <Alert onClose={() => setError(null)} severity="error">
+              {error}
+            </Alert>
+          </Snackbar>
+        )}
       </Container>
     )
   );

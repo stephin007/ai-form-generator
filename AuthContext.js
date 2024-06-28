@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [feedback, setFeedback] = useState("");
   const [open, setOpen] = useState(false);
   const [success, setSuccess] = useState(null);
+  const [error, setError] = useState(null);
   const [apiCallCount, setApiCallCount] = useState(0);
   const [openModal, setOpenModal] = useState(false);
 
@@ -47,6 +48,8 @@ export const AuthProvider = ({ children }) => {
         setFeedback,
         success,
         setSuccess,
+        error,
+        setError,
         apiCallCount,
         setApiCallCount,
         open,

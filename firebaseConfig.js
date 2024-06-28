@@ -14,6 +14,7 @@ import {
   collection,
   addDoc,
   getDocs,
+  deleteDoc,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -141,6 +142,16 @@ const fetchForms = async (userId) => {
   }
 };
 
+const deleteForm = async (userId, formId) => {
+  try {
+    const formRef = doc(db, "users", userId, "forms", formId);
+    await deleteDoc(formRef);
+  } catch (error) {
+    console.error("Error deleting form: ", error);
+    throw new Error("Failed to delete the form.");
+  }
+};
+
 export {
   auth,
   signInWithGoogle,
@@ -150,4 +161,5 @@ export {
   saveFeedback,
   saveToProfile,
   fetchForms,
+  deleteForm,
 };
