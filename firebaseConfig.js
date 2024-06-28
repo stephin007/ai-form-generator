@@ -14,7 +14,7 @@ import {
   updateDoc,
   collection,
   addDoc,
-  onSnapshot,
+  getDocs,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -110,16 +110,35 @@ const saveFeedback = async (feedback) => {
   }
 };
 
-const saveToProfile = async (formSchema, userEmail) => {
+const saveToProfile = async (formSchema, userEmail, userId) => {
   try {
-    const formsRef = collection(db, "forms");
-    await addDoc(formsRef, {
+    const userFormsRef = collection(db, "users", userId, "forms");
+    await addDoc(userFormsRef, {
       userEmail: userEmail,
+      userId: userId,
       formSchema: formSchema,
       createdAt: new Date(),
     });
   } catch (err) {
     console.error("Error saving form: ", err);
+  }
+};
+
+const fetchForms = async (userId) => {
+  try {
+    const formsRef = collection(db, "users", userId, "forms");
+    const formsSnapshot = await getDocs(formsRef);
+    console.log("formsSnapshot: ", formsSnapshot);
+
+    const userForms = formsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return userForms;
+  } catch (err) {
+    console.error("Error fetching forms: ", err);
+    return [];
   }
 };
 
@@ -131,4 +150,5 @@ export {
   incrementApiCallCount,
   saveFeedback,
   saveToProfile,
+  fetchForms,
 };

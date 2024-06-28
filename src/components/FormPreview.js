@@ -33,7 +33,7 @@ const FormPreview = ({
   const handleSaveToProfile = async () => {
     if (user) {
       try {
-        await saveToProfile(formSchema, user.email);
+        await saveToProfile(formSchema, user.email, user.uid);
         setSuccess("Form saved to profile successfully!");
       } catch (error) {
         setError("Error saving form to profile: " + error.message);
