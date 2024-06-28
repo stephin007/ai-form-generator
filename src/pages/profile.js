@@ -148,6 +148,34 @@ const ProfilePage = () => {
     );
   };
 
+  const jsonToCSV = (jsonData) => {
+    const keys = Object.keys(jsonData.properties);
+    const csvRows = keys.map((key) => {
+      const field = jsonData.properties[key];
+      return `${key}, ${field.title || ""}, ${field.type || ""}, ${
+        field.format || ""
+      }`;
+    });
+    return ["Key, Title, Type, Format", ...csvRows].join("\n");
+  };
+
+  const downloadCSV = (csvString, filename) => {
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${filename}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportToCSV = (form) => {
+    const csvString = jsonToCSV(form.formSchema);
+    downloadCSV(csvString, form.formSchema.title || "UntitledForm");
+  };
+
   if (loading || loadingForms) {
     return (
       <Container
@@ -221,7 +249,14 @@ const ProfilePage = () => {
                   />
                   <CardContent>{renderForm(form.formSchema)}</CardContent>
                   <CardActions>
-                    <Button size="small" color="secondary">
+                    <Button
+                      size="small"
+                      color="secondary"
+                      onClick={() => handleExportToCSV(form)}
+                    >
+                      Export to CSV
+                    </Button>
+                    <Button size="small" color="error">
                       Delete
                     </Button>
                   </CardActions>
