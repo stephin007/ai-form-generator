@@ -1,4 +1,3 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
@@ -14,7 +13,8 @@ import {
   updateDoc,
   collection,
   addDoc,
-  onSnapshot,
+  getDocs,
+  deleteDoc,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -110,6 +110,48 @@ const saveFeedback = async (feedback) => {
   }
 };
 
+const saveToProfile = async (formSchema, userEmail, userId) => {
+  try {
+    const userFormsRef = collection(db, "users", userId, "forms");
+    await addDoc(userFormsRef, {
+      userEmail: userEmail,
+      userId: userId,
+      formSchema: formSchema,
+      createdAt: new Date(),
+    });
+  } catch (err) {
+    console.error("Error saving form: ", err);
+  }
+};
+
+const fetchForms = async (userId) => {
+  try {
+    const formsRef = collection(db, "users", userId, "forms");
+    const formsSnapshot = await getDocs(formsRef);
+    console.log("formsSnapshot: ", formsSnapshot);
+
+    const userForms = formsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return userForms;
+  } catch (err) {
+    console.error("Error fetching forms: ", err);
+    return [];
+  }
+};
+
+const deleteForm = async (userId, formId) => {
+  try {
+    const formRef = doc(db, "users", userId, "forms", formId);
+    await deleteDoc(formRef);
+  } catch (error) {
+    console.error("Error deleting form: ", error);
+    throw new Error("Failed to delete the form.");
+  }
+};
+
 export {
   auth,
   signInWithGoogle,
@@ -117,4 +159,7 @@ export {
   getUserApiCallCount,
   incrementApiCallCount,
   saveFeedback,
+  saveToProfile,
+  fetchForms,
+  deleteForm,
 };
