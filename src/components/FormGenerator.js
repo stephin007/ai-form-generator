@@ -121,30 +121,9 @@ const FormGenerator = () => {
         `;
 
     try {
-      const response = await axios.post(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          model: "gpt-3.5-turbo",
-          messages: [
-            {
-              role: "system",
-              content:
-                'You are an assistant that generates user-friendly JSON schemas for forms. You should only create fields which have the type of text, number, boolean, date, password, select, phone, url, and time. The schema should contain the title, type, format, and any other relevant properties. for select format type, the schema should have format as "select"',
-            },
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-          temperature: 0,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${openaiApiKey}`,
-          },
-        }
-      );
+      const response = await axios.post("/api/generateFormSchema", {
+        prompt: prompt,
+      });
 
       if (response.data.choices && response.data.choices.length > 0) {
         try {
