@@ -146,10 +146,23 @@ const FormPreview = ({
           );
         }
 
+        if (field.format === "email") {
+          return (
+            <TextField
+              label={field.title}
+              type="email"
+              name={key}
+              required={isRequired}
+              onChange={handleChange}
+              fullWidth
+            />
+          );
+        }
+
         return (
           <TextField
             label={field.title}
-            type={field.format === "email" ? "email" : "text"}
+            type="text"
             name={key}
             required={isRequired}
             minLength={field.minLength}

@@ -14,7 +14,7 @@ export default async function handler(req, res) {
             {
               role: "system",
               content:
-                'You are an assistant that generates user-friendly JSON schemas for forms. You should only create fields which have the type of text, number, boolean, date, password, select, phone, url, and time. The schema should contain the title, type, format, and any other relevant properties. for select format type, the schema should have format as "select"',
+                'You are an assistant that generates user-friendly JSON schemas for forms. You should only create fields which have the type of text, number, boolean, date, password, select, phone, url, and time. The schema should contain the title, type, format, and any other relevant properties. for select format type, the schema should have format as "select" , for field type which requires a lot of content to be written , the schema should have a format as "textarea" otherwise as "text"',
             },
             { role: "user", content: prompt },
           ],
