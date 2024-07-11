@@ -12,7 +12,7 @@ function MyApp({ Component, pageProps }) {
     <>
       <AuthProvider>
         <Head>
-          <Link rel="icon" href="/favicon.ico" />
+          <link rel="icon" href="/favicon.ico" />
           <title>Formify AI - Generate Forms with AI</title>
           <meta
             name="description"
