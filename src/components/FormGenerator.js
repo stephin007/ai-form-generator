@@ -19,6 +19,7 @@ import FormStepper from "./FormStepper";
 import FormContent from "./FormContent";
 import FormPreview from "./FormPreview";
 import TemplatesList from "./TemplatesList";
+import FormEditor from "./FormEditor";
 import theme from "../styles/themes";
 import { useAuth } from "../../AuthContext";
 import {
@@ -50,6 +51,7 @@ const FormGenerator = () => {
     setOpenModal,
     handleModalClose,
     handleFeedback,
+    edit,
   } = useAuth();
 
   useEffect(() => {
@@ -376,6 +378,21 @@ const FormGenerator = () => {
                 handleSubmit={handleSubmit}
                 exportToCSV={exportToCSV}
               />
+              {formSchema && edit && (
+                <Paper
+                  elevation={3}
+                  style={{
+                    padding: "24px",
+                    marginTop: "16px",
+                    marginBottom: "16px",
+                  }}
+                >
+                  <FormEditor
+                    formSchema={formSchema}
+                    setFormSchema={setFormSchema}
+                  />
+                </Paper>
+              )}
             </Grid>
           </Grid>
         </Container>
