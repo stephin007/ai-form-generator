@@ -5,12 +5,14 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../styles/global.css";
 
 import { AuthProvider } from "../../AuthContext";
+import Link from "next/link";
 
 function MyApp({ Component, pageProps }) {
   return (
     <>
       <AuthProvider>
         <Head>
+          <Link rel="icon" href="/favicon.ico" />
           <title>Formify AI - Generate Forms with AI</title>
           <meta
             name="description"
