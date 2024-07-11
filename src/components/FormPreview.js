@@ -14,6 +14,8 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  MenuItem,
+  Select,
 } from "@mui/material";
 import { useAuth } from "../../AuthContext";
 import { saveToProfile } from "../../firebaseConfig";
@@ -46,6 +48,104 @@ const FormPreview = ({
   const renderFormField = (field, key, isRequired) => {
     switch (field.type) {
       case "string":
+        if (field.format === "textarea") {
+          return (
+            <TextField
+              label={field.title}
+              type="text"
+              name={key}
+              required={isRequired}
+              minLength={field.minLength}
+              maxLength={field.maxLength}
+              multiline
+              rows={4}
+              onChange={handleChange}
+              fullWidth
+            />
+          );
+        }
+        if (field.format === "date") {
+          return (
+            <TextField
+              label={field.title}
+              type={field.format}
+              name={key}
+              required={isRequired}
+              InputLabelProps={{ shrink: true }}
+              onChange={handleChange}
+              fullWidth
+            />
+          );
+        }
+
+        if (field.format === "password") {
+          return (
+            <TextField
+              label={field.title}
+              type={field.format}
+              name={key}
+              required={isRequired}
+              onChange={handleChange}
+              fullWidth
+            />
+          );
+        }
+
+        if (field.format === "phone") {
+          return (
+            <TextField
+              label={field.title}
+              type="tel"
+              name={key}
+              required={isRequired}
+              onChange={handleChange}
+              fullWidth
+            />
+          );
+        }
+
+        if (field.format === "url") {
+          return (
+            <TextField
+              label={field.title}
+              type="url"
+              name={key}
+              required={isRequired}
+              onChange={handleChange}
+              fullWidth
+            />
+          );
+        }
+
+        if (field.format === "time") {
+          return (
+            <TextField
+              label={field.title}
+              type="time"
+              name={key}
+              required={isRequired}
+              InputLabelProps={{ shrink: true }}
+              onChange={handleChange}
+              fullWidth
+            />
+          );
+        }
+
+        if (field.format === "select") {
+          return (
+            <FormControl fullWidth required={isRequired}>
+              <FormLabel>{field.title}</FormLabel>
+              <Select name={key} onChange={handleChange} defaultValue="">
+                {field.enum.map((option, index) => (
+                  <MenuItem key={index} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+        }
+
         return (
           <TextField
             label={field.title}
@@ -81,6 +181,18 @@ const FormPreview = ({
             </RadioGroup>
           </FormControl>
         );
+        return (
+          <FormControl fullWidth required={isRequired}>
+            <FormLabel>{field.title}</FormLabel>
+            <Select name={key} onChange={handleChange} defaultValue="">
+              {field.options.map((option, index) => (
+                <MenuItem key={index} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
       default:
         return null;
     }
@@ -90,6 +202,8 @@ const FormPreview = ({
     if (!formSchema || !formSchema.properties) {
       return null;
     }
+
+    console.log(formSchema);
 
     return (
       <form onSubmit={handleSubmit}>

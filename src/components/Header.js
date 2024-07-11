@@ -28,8 +28,8 @@ const Header = () => {
         {user ? (
           <>
             <IconButton color="inherit">
-              <Badge badgeContent={`${5 - apiCallCount}/5`} color="secondary">
-                <Chip label="Free Attempts Left" sx={{ color: "white" }} />
+              <Badge badgeContent={`${5 - apiCallCount}`} color="secondary">
+                <Chip label="Credits Left" sx={{ color: "white" }} />
               </Badge>
             </IconButton>
             <ProfileMenu />

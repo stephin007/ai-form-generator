@@ -117,7 +117,7 @@ const FormGenerator = () => {
             Create a JSON schema for a ${formTypeToUse} form with ${numFieldsToUse} fields.
             Form Description: ${formDescriptionToUse}.
             The questions should be meaningful and not contain placeholders like question 1, question 2, etc.
-            The form should be user-friendly.
+            The form should be user-friendly. The fields should be relevant to the form type.The response should always be in JSON format , there should be no filler explanation
         `;
 
     try {
@@ -129,7 +129,7 @@ const FormGenerator = () => {
             {
               role: "system",
               content:
-                "You are an assistant that generates user-friendly JSON schemas for forms.",
+                'You are an assistant that generates user-friendly JSON schemas for forms. You should only create fields which have the type of text, number, boolean, date, password, select, phone, url, and time. The schema should contain the title, type, format, and any other relevant properties. for select format type, the schema should have format as "select"',
             },
             {
               role: "user",
