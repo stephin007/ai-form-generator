@@ -24,7 +24,7 @@ function MyApp({ Component, pageProps }) {
             property="og:description"
             content="Formify AI helps you generate forms using AI. Create user-friendly and meaningful forms in just a few steps."
           />
-          <meta property="og:url" content="formifyai.vercel.app" />
+          <meta property="og:url" content="formifyai.in" />
           <meta
             name="twitter:title"
             content="Formify AI - Generate Forms with AI"
