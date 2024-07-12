@@ -13,6 +13,7 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [apiCallCount, setApiCallCount] = useState(0);
   const [openModal, setOpenModal] = useState(false);
+  const [edit, setEdit] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -38,6 +39,10 @@ export const AuthProvider = ({ children }) => {
     setSuccess("Feedback submitted successfully!");
   };
 
+  const handleEditForm = () => {
+    setEdit(true);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -59,6 +64,9 @@ export const AuthProvider = ({ children }) => {
         handleModalOpen,
         handleModalClose,
         handleFeedback,
+        edit,
+        setEdit,
+        handleEditForm,
       }}
     >
       {children}

@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import { useAuth } from "../../AuthContext";
 import { saveToProfile } from "../../firebaseConfig";
+import DrawIcon from "@mui/icons-material/Draw";
 
 const FormPreview = ({
   loading,
@@ -30,7 +31,8 @@ const FormPreview = ({
   handleSubmit,
   exportToCSV,
 }) => {
-  const { user, success, setSuccess } = useAuth();
+  const { user, success, setSuccess, edit, setEdit, handleEditForm } =
+    useAuth();
 
   const handleSaveToProfile = async () => {
     if (user) {
@@ -47,42 +49,12 @@ const FormPreview = ({
 
   const renderFormField = (field, key, isRequired) => {
     switch (field.type) {
-      case "string":
-        if (field.format === "textarea") {
-          return (
-            <TextField
-              label={field.title}
-              type="text"
-              name={key}
-              required={isRequired}
-              minLength={field.minLength}
-              maxLength={field.maxLength}
-              multiline
-              rows={4}
-              onChange={handleChange}
-              fullWidth
-            />
-          );
-        }
-        if (field.format === "date") {
-          return (
-            <TextField
-              label={field.title}
-              type={field.format}
-              name={key}
-              required={isRequired}
-              InputLabelProps={{ shrink: true }}
-              onChange={handleChange}
-              fullWidth
-            />
-          );
-        }
-
+      case "text":
         if (field.format === "password") {
           return (
             <TextField
               label={field.title}
-              type={field.format}
+              type="password"
               name={key}
               required={isRequired}
               onChange={handleChange}
@@ -131,47 +103,28 @@ const FormPreview = ({
           );
         }
 
-        if (field.format === "select") {
-          return (
-            <FormControl fullWidth required={isRequired}>
-              <FormLabel>{field.title}</FormLabel>
-              <Select name={key} onChange={handleChange} defaultValue="">
-                {field.enum.map((option, index) => (
-                  <MenuItem key={index} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          );
-        }
-
-        if (field.format === "email") {
-          return (
-            <TextField
-              label={field.title}
-              type="email"
-              name={key}
-              required={isRequired}
-              onChange={handleChange}
-              fullWidth
-            />
-          );
-        }
-
         return (
           <TextField
             label={field.title}
             type="text"
             name={key}
             required={isRequired}
-            minLength={field.minLength}
-            maxLength={field.maxLength}
             onChange={handleChange}
             fullWidth
           />
         );
       case "number":
+        return (
+          <TextField
+            label={field.title}
+            type="number"
+            name={key}
+            required={isRequired}
+            inputProps={{ min: field.minimum }}
+            onChange={handleChange}
+            fullWidth
+          />
+        );
       case "integer":
         return (
           <TextField
@@ -179,7 +132,7 @@ const FormPreview = ({
             type="number"
             name={key}
             required={isRequired}
-            inputProps={{ min: field.minimum, max: field.maximum }}
+            inputProps={{ min: field.minimum, step: 1 }}
             onChange={handleChange}
             fullWidth
           />
@@ -194,17 +147,75 @@ const FormPreview = ({
             </RadioGroup>
           </FormControl>
         );
+      case "select":
         return (
           <FormControl fullWidth required={isRequired}>
             <FormLabel>{field.title}</FormLabel>
             <Select name={key} onChange={handleChange} defaultValue="">
-              {field.options.map((option, index) => (
+              {field.enum.map((option, index) => (
                 <MenuItem key={index} value={option}>
                   {option}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
+        );
+      case "date":
+        return (
+          <TextField
+            label={field.title}
+            type="date"
+            name={key}
+            required={isRequired}
+            InputLabelProps={{ shrink: true }}
+            onChange={handleChange}
+            fullWidth
+          />
+        );
+      case "password":
+        return (
+          <TextField
+            label={field.title}
+            type="password"
+            name={key}
+            required={isRequired}
+            onChange={handleChange}
+            fullWidth
+          />
+        );
+      case "phone":
+        return (
+          <TextField
+            label={field.title}
+            type="tel"
+            name={key}
+            required={isRequired}
+            onChange={handleChange}
+            fullWidth
+          />
+        );
+      case "url":
+        return (
+          <TextField
+            label={field.title}
+            type="url"
+            name={key}
+            required={isRequired}
+            onChange={handleChange}
+            fullWidth
+          />
+        );
+      case "time":
+        return (
+          <TextField
+            label={field.title}
+            type="time"
+            name={key}
+            required={isRequired}
+            InputLabelProps={{ shrink: true }}
+            onChange={handleChange}
+            fullWidth
+          />
         );
       default:
         return null;
@@ -250,6 +261,17 @@ const FormPreview = ({
               onClick={handleSaveToProfile}
             >
               Save to Profile
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              type="button"
+              variant="outlined"
+              color="secondary"
+              onClick={handleEditForm}
+              startIcon={<DrawIcon />}
+            >
+              Edit
             </Button>
           </Grid>
         </Grid>

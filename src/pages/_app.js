@@ -5,7 +5,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../styles/global.css";
 
 import { AuthProvider } from "../../AuthContext";
-import Link from "next/link";
 
 function MyApp({ Component, pageProps }) {
   return (
