@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import { useAuth } from "../../AuthContext";
 import { saveToProfile } from "../../firebaseConfig";
+import DrawIcon from "@mui/icons-material/Draw";
 
 const FormPreview = ({
   loading,
@@ -265,9 +266,10 @@ const FormPreview = ({
           <Grid item>
             <Button
               type="button"
-              variant="contained"
+              variant="outlined"
               color="secondary"
               onClick={handleEditForm}
+              startIcon={<DrawIcon />}
             >
               Edit
             </Button>

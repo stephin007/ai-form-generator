@@ -11,8 +11,9 @@ import {
   useMediaQuery,
   useTheme,
   IconButton,
+  Tooltip,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { Add as AddIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { useAuth } from "../../AuthContext";
 
 const fieldTypes = [
@@ -57,6 +58,98 @@ const FormEditor = ({ formSchema, setFormSchema }) => {
     setFormSchema({ ...formSchema, properties: updatedProperties });
   };
 
+  const renderFieldOptions = (key, field) => {
+    switch (field.type) {
+      case "string":
+      case "password":
+        return (
+          <>
+            <Grid item xs={6}>
+              <TextField
+                label="Min Length"
+                type="number"
+                value={field.minLength || ""}
+                onChange={(e) =>
+                  handleFieldChange(key, "minLength", e.target.value)
+                }
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Max Length"
+                type="number"
+                value={field.maxLength || ""}
+                onChange={(e) =>
+                  handleFieldChange(key, "maxLength", e.target.value)
+                }
+                fullWidth
+              />
+            </Grid>
+            <Divider
+              style={{ width: "100%", marginTop: "16px", marginLeft: "9px" }}
+            />
+          </>
+        );
+      case "number":
+      case "integer":
+        return (
+          <>
+            <Grid item xs={6}>
+              <TextField
+                label="Minimum"
+                type="number"
+                value={field.minimum || ""}
+                onChange={(e) =>
+                  handleFieldChange(key, "minimum", e.target.value)
+                }
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Maximum"
+                type="number"
+                value={field.maximum || ""}
+                onChange={(e) =>
+                  handleFieldChange(key, "maximum", e.target.value)
+                }
+                fullWidth
+              />
+            </Grid>
+
+            <Divider
+              style={{ width: "100%", marginTop: "16px", marginLeft: "9px" }}
+            />
+          </>
+        );
+      case "select":
+        return (
+          <>
+            <Grid item xs={12}>
+              <TextField
+                label="Options (comma separated)"
+                value={field.enum ? field.enum.join(", ") : ""}
+                onChange={(e) =>
+                  handleFieldChange(
+                    key,
+                    "enum",
+                    e.target.value.split(",").map((opt) => opt.trim())
+                  )
+                }
+                fullWidth
+              />
+            </Grid>
+            <Divider
+              style={{ width: "100%", marginTop: "16px", marginLeft: "9px" }}
+            />
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
   if (!formSchema) return null;
 
   return (
@@ -86,9 +179,13 @@ const FormEditor = ({ formSchema, setFormSchema }) => {
                 <FormControl fullWidth>
                   <Select
                     value={field.type}
-                    onChange={(e) =>
-                      handleFieldChange(key, "type", e.target.value)
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleFieldChange(key, "type", value);
+                      if (value === "select" && !field.enum) {
+                        handleFieldChange(key, "enum", []);
+                      }
+                    }}
                     fullWidth
                     variant="outlined"
                     size="small"
@@ -101,20 +198,6 @@ const FormEditor = ({ formSchema, setFormSchema }) => {
                   </Select>
                 </FormControl>
               </Grid>
-              {field.type === "select" && (
-                <Grid item xs={12} sm={6} md={3}>
-                  <TextField
-                    label="Options (comma separated)"
-                    value={field.enum ? field.enum.join(",") : ""}
-                    onChange={(e) =>
-                      handleFieldChange(key, "enum", e.target.value.split(","))
-                    }
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                  />
-                </Grid>
-              )}
               <Grid
                 item
                 xs={12}
@@ -127,9 +210,12 @@ const FormEditor = ({ formSchema, setFormSchema }) => {
                   color="secondary"
                   onClick={() => handleDeleteField(key)}
                 >
-                  <DeleteIcon />
+                  <Tooltip title="Delete Field">
+                    <DeleteIcon />
+                  </Tooltip>
                 </IconButton>
               </Grid>
+              {renderFieldOptions(key, field)}
             </Grid>
           );
         })}
@@ -140,6 +226,7 @@ const FormEditor = ({ formSchema, setFormSchema }) => {
         onClick={handleAddField}
         style={{ marginTop: "16px" }}
         fullWidth={isMobile}
+        startIcon={<AddIcon />}
       >
         Add Field
       </Button>
